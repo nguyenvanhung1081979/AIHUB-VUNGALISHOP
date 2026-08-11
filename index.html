@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VungAliShop AI Hub — Hệ điều hành kinh doanh tự động</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          base:     '#080a08',
+          surface:  '#0f120f',
+          elevated: '#141814',
+          line:     '#232823',
+          lime: {
+            DEFAULT: '#c8fa2e',
+            bright:  '#dcff5a',
+            dim:     '#8fae1f',
+          },
+          ink: '#e7ece5',
+          muted: '#8a938a',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+          display: ['Space Grotesk', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  :root { color-scheme: dark; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: #080a08;
+    background-image:
+      radial-gradient(900px 500px at 78% -10%, rgba(200,250,46,0.10), transparent 60%),
+      radial-gradient(700px 500px at 0% 100%, rgba(200,250,46,0.05), transparent 55%);
+    background-attachment: fixed;
+  }
+  /* Lưới nền kiểu bảng mạch */
+  .grid-bg::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(circle at 50% 20%, #000 0%, transparent 78%);
+            mask-image: radial-gradient(circle at 50% 20%, #000 0%, transparent 78%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Con trỏ nhấp nháy */
+  .cursor::after { content:"▌"; margin-left:2px; color:#c8fa2e; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .dot-live { box-shadow: 0 0 0 0 rgba(200,250,46,0.6); animation: pulse 1.8s infinite; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(200,250,46,0.55); }
+    70%  { box-shadow: 0 0 0 7px rgba(200,250,46,0); }
+    100% { box-shadow: 0 0 0 0 rgba(200,250,46,0); }
+  }
+
+  /* Chuyển tab */
+  .panel { display: none; }
+  .panel.active { display: block; animation: panelIn .38s cubic-bezier(.2,.7,.2,1); }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .card-hover { transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200,250,46,0.45);
+    box-shadow: 0 14px 40px -18px rgba(200,250,46,0.35);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: #0f120f; }
+  ::-webkit-scrollbar-thumb { background: #2c332c; border-radius: 20px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3c453c; }
+
+  .chip { transition: all .18s ease; }
+  .chip:hover { background: rgba(200,250,46,0.12); border-color: rgba(200,250,46,0.5); color: #dcff5a; transform: translateY(-1px); }
+
+  /* Modal */
+  .modal-back { backdrop-filter: blur(6px); }
+  .modal-card { animation: modalIn .28s cubic-bezier(.2,.8,.2,1); }
+  @keyframes modalIn { from { opacity:0; transform: translateY(18px) scale(.98); } to { opacity:1; transform:none; } }
+
+  .toast-in { animation: toastIn .3s ease; }
+  @keyframes toastIn { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform:none; } }
+
+  .tab-btn.active { color:#080a08; }
+  .glow-text { text-shadow: 0 0 22px rgba(200,250,46,0.35); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+
+<body class="grid-bg font-sans text-ink min-h-screen antialiased">
+
+<div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+
+  <!-- ============ HEADER / CONSOLE ============ -->
+  <header class="pt-6">
+    <!-- Thanh telemetry -->
+    <div class="flex items-center justify-between text-[11px] font-mono text-muted border border-line rounded-lg bg-surface/70 px-3 py-2 mb-5">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-lime dot-live"></span>
+        <span id="boot" class="text-lime/90 cursor"></span>
+      </div>
+      <div class="hidden sm:flex items-center gap-4">
+        <span>uptime <span class="text-ink" id="uptime">00:00</span></span>
+        <span>node <span class="text-lime">SG-01</span></span>
+        <span class="text-lime">● SYSTEM ONLINE</span>
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div>
+        <div class="font-mono text-[11px] tracking-[0.3em] text-lime/70 mb-2">// SOLOPRENEUR_OS &nbsp;v2.0</div>
+        <h1 class="font-display text-4xl sm:text-5xl font-700 leading-none">
+          VungAliShop <span class="text-lime glow-text">AI</span> Hub
+        </h1>
+        <p class="text-muted mt-3 max-w-xl text-sm leading-relaxed">
+          Trung tâm điều khiển đóng gói toàn bộ hệ thống kinh doanh tự động — từ đào tạo, tra cứu tri thức bằng AI đến kho công cụ thực chiến cho creator &amp; affiliate.
+        </p>
+      </div>
+
+      <!-- Tabs -->
+      <nav class="flex items-center gap-1 p-1 bg-surface border border-line rounded-xl font-mono text-sm shrink-0 flex-wrap">
+        <button data-tab="learn" class="tab-btn active px-4 py-2 rounded-lg bg-lime font-600 transition-colors">Học Tập</button>
+        <button data-tab="ai" class="tab-btn px-4 py-2 rounded-lg text-muted hover:text-ink transition-colors">Tra Cứu AI</button>
+        <button data-tab="practice" class="tab-btn px-4 py-2 rounded-lg text-muted hover:text-ink transition-colors">Thực Hành</button>
+        <button data-tab="shop" class="tab-btn px-4 py-2 rounded-lg text-lime hover:text-lime-bright transition-colors">Công Cụ AI ✦</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Banner cộng đồng / quà tặng -->
+  <a href="https://zalo.me/g/drxyl1aua4e0tqdme76y" target="_blank" rel="noopener"
+     class="group mt-5 flex items-center justify-between gap-3 bg-gradient-to-r from-lime/10 to-transparent border border-lime/30 rounded-xl px-4 py-3 hover:border-lime/60 transition-colors">
+    <div class="flex items-center gap-3">
+      <span class="text-xl">🎁</span>
+      <p class="text-sm"><span class="text-lime font-600">Miễn phí:</span> vào cộng đồng VungAliShop AI Hub nhận trọn bộ công cụ + prompt bán hàng &amp; cập nhật mới nhất.</p>
+    </div>
+    <span class="shrink-0 font-mono text-xs text-lime flex items-center gap-1.5">
+      Vào nhóm Zalo
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </span>
+  </a>
+
+  <!-- ============ TAB 1: HỌC TẬP ============ -->
+  <section id="panel-learn" class="panel active mt-10">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="font-mono text-xs text-lime/70">01 //</span>
+      <h2 class="font-display text-xl font-600">Lộ trình đào tạo</h2>
+      <div class="flex-1 h-px bg-line"></div>
+      <span id="lesson-count" class="font-mono text-xs text-muted"></span>
+    </div>
+    <div id="lesson-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- ============ TAB 2: TRA CỨU AI ============ -->
+  <section id="panel-ai" class="panel mt-10">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="font-mono text-xs text-lime/70">02 //</span>
+      <h2 class="font-display text-xl font-600">Trợ lý tri thức RAG</h2>
+      <div class="flex-1 h-px bg-line"></div>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+      <!-- API key -->
+      <div class="flex flex-col sm:flex-row gap-2 mb-4">
+        <div class="relative flex-1">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-lime/60">API_KEY</span>
+          <input id="apikey" type="password" placeholder="Dán API key của bạn…"
+            class="w-full bg-surface border border-line rounded-lg pl-[76px] pr-3 py-2.5 text-sm font-mono text-ink placeholder:text-muted/60 focus:outline-none focus:border-lime/60 transition-colors" />
+        </div>
+        <button id="save-key" class="px-4 py-2.5 rounded-lg bg-elevated border border-line text-sm font-mono hover:border-lime/50 hover:text-lime transition-colors whitespace-nowrap">
+          Lưu key
+        </button>
+      </div>
+
+      <!-- Chat window -->
+      <div class="bg-surface border border-line rounded-2xl overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-2.5 border-b border-line bg-elevated/50">
+          <div class="flex items-center gap-2 font-mono text-xs text-muted">
+            <span class="w-2 h-2 rounded-full bg-lime dot-live"></span> rag-agent · kb_v2.0
+          </div>
+          <button id="clear-chat" class="font-mono text-xs text-muted hover:text-lime transition-colors">clear</button>
+        </div>
+
+        <div id="chat" class="h-[46vh] min-h-[320px] overflow-y-auto px-4 py-5 space-y-5"></div>
+
+        <div id="chips" class="px-4 pb-3 flex flex-wrap gap-2"></div>
+
+        <div class="p-3 border-t border-line bg-elevated/40">
+          <div class="flex gap-2">
+            <input id="chat-input" type="text" placeholder="Hỏi bất cứ điều gì về KOL AI, traffic, affiliate…"
+              class="flex-1 bg-base border border-line rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-lime/60 transition-colors" />
+            <button id="send" class="px-5 rounded-lg bg-lime text-base font-600 text-sm hover:bg-lime-bright transition-colors flex items-center gap-2">
+              Gửi
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <p class="font-mono text-[10px] text-muted/70 mt-2 px-1">
+            * Đã nối <span class="text-lime/70">Gemini API</span> (model gemini-3.6-flash). Chưa nhập key → chạy demo cục bộ; nhập key của bạn → dùng AI thật.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: THỰC HÀNH ============ -->
+  <section id="panel-practice" class="panel mt-10">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="font-mono text-xs text-lime/70">03 //</span>
+      <h2 class="font-display text-xl font-600">Kho công cụ thực chiến</h2>
+      <div class="flex-1 h-px bg-line"></div>
+    </div>
+    <div id="tool-list" class="space-y-4"></div>
+  </section>
+
+  <!-- ============ TAB 4: CÔNG CỤ AI (GIAN HÀNG) ============ -->
+  <section id="panel-shop" class="panel mt-10">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="font-mono text-xs text-lime/70">04 //</span>
+      <h2 class="font-display text-xl font-600">Công cụ AI mình đang dùng</h2>
+      <div class="flex-1 h-px bg-line"></div>
+    </div>
+
+    <!-- Flagship -->
+    <a id="flagship" href="https://dangbaitudong.cloud/" target="_blank" rel="noopener"
+       class="card-hover block bg-gradient-to-br from-lime/12 via-surface to-surface border border-lime/40 rounded-2xl p-6 mb-4 group">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+        <div>
+          <div class="font-mono text-[11px] text-lime/80 mb-2">★ HỆ THỐNG CHỦ LỰC</div>
+          <h3 class="font-display text-2xl font-600 mb-1">VungAliShop AI Hub — Đăng bài tự động</h3>
+          <p class="text-sm text-muted max-w-lg">Kết nối fanpage, tải ảnh/video, để AI viết caption và tự động đăng đúng lịch. Một nền tảng thay cả quy trình content.</p>
+        </div>
+        <span class="shrink-0 inline-flex items-center gap-2 bg-lime text-base font-600 text-sm px-5 py-3 rounded-xl group-hover:bg-lime-bright transition-colors">
+          Dùng thử ngay
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <div id="product-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+    <!-- Sách -->
+    <a href="https://matmakhoinghiepai.vercel.app/" target="_blank" rel="noopener"
+       class="card-hover mt-4 flex items-center justify-between gap-4 bg-surface border border-line rounded-2xl p-5 group">
+      <div class="flex items-center gap-4">
+        <span class="text-3xl">📘</span>
+        <div>
+          <div class="font-mono text-[10px] text-lime/60 mb-1">SÁCH</div>
+          <h3 class="font-display text-lg font-600">Mật mã khởi nghiệp AI</h3>
+          <p class="text-sm text-muted">Tư duy &amp; lộ trình khởi nghiệp cùng AI cho solopreneur.</p>
+        </div>
+      </div>
+      <span class="shrink-0 font-mono text-xs text-lime flex items-center gap-1.5">
+        Xem sách
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  </section>
+</div>
+
+<!-- ============ FOOTER / CỘNG ĐỒNG ============ -->
+<footer class="relative z-10 border-t border-line bg-surface/60 mt-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="grid md:grid-cols-2 gap-8 items-start">
+      <!-- Lead capture -->
+      <div>
+        <div class="font-mono text-[11px] text-lime/70 mb-2">// NHẬN QUÀ + KẾT NỐI</div>
+        <h3 class="font-display text-xl font-600 mb-2">Nhận trọn bộ công cụ AI miễn phí</h3>
+        <p class="text-sm text-muted mb-3">Để lại họ tên &amp; số điện thoại — VungAliShop sẽ gửi bộ quà tặng &amp; hướng dẫn qua Zalo.</p>
+        <div class="max-w-md space-y-2">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="lead-name" type="text" placeholder="Họ và tên"
+              class="flex-1 bg-base border border-line rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-lime/60 transition-colors" />
+            <input id="lead-phone" type="tel" placeholder="Số điện thoại / Zalo"
+              class="flex-1 bg-base border border-line rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-lime/60 transition-colors" />
+          </div>
+          <div class="flex gap-2">
+            <select id="lead-service"
+              class="flex-1 bg-base border border-line rounded-lg px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-lime/60 transition-colors">
+              <option value="Quà tặng AI Tools">Quà tặng AI Tools</option>
+              <option value="Kho Prompt AI Video">Kho Prompt AI Video</option>
+              <option value="Sáng tạo nội dung AI">Tư vấn dịch vụ / gói</option>
+            </select>
+            <button id="lead-submit" class="px-5 py-2.5 rounded-lg bg-lime text-base font-600 text-sm hover:bg-lime-bright transition-colors whitespace-nowrap">Nhận quà</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liên hệ -->
+      <div class="md:text-right">
+        <div class="font-mono text-[11px] text-lime/70 mb-2">// LIÊN HỆ &amp; CỘNG ĐỒNG</div>
+        <div class="flex flex-wrap md:justify-end gap-2 mb-3">
+          <a href="https://zalo.me/g/drxyl1aua4e0tqdme76y" target="_blank" rel="noopener" class="chip font-mono text-xs text-ink border border-line rounded-full px-4 py-2 bg-base/60">💬 Nhóm Zalo</a>
+          <a href="https://www.facebook.com/vungalishop" target="_blank" rel="noopener" class="chip font-mono text-xs text-ink border border-line rounded-full px-4 py-2 bg-base/60">👍 Fanpage</a>
+          <a href="https://zalo.me/0912919686" target="_blank" rel="noopener" class="chip font-mono text-xs text-ink border border-line rounded-full px-4 py-2 bg-base/60">📞 0912.919.686</a>
+        </div>
+        <button id="share-btn" class="inline-flex items-center gap-2 font-mono text-xs text-lime border border-lime/40 rounded-full px-4 py-2 hover:bg-lime/10 transition-colors">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+          Chia sẻ Hub này
+        </button>
+      </div>
+    </div>
+    <div class="mt-8 pt-6 border-t border-line flex flex-col sm:flex-row justify-between gap-2 font-mono text-[11px] text-muted">
+      <span>© 2026 VungAliShop AI Hub · Vừng Ali Shop</span>
+      <span class="text-lime/60">● SYSTEM ONLINE</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ MODAL ============ -->
+<div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-back bg-black/60">
+  <div class="modal-card w-full max-w-2xl max-h-[85vh] overflow-hidden bg-surface border border-line rounded-2xl flex flex-col">
+    <div class="flex items-start justify-between gap-4 p-5 border-b border-line">
+      <div>
+        <div id="modal-tag" class="font-mono text-[11px] text-lime/70 mb-1"></div>
+        <h3 id="modal-title" class="font-display text-2xl font-600"></h3>
+      </div>
+      <button id="modal-close" class="shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-line text-muted hover:text-lime hover:border-lime/50 transition-colors">✕</button>
+    </div>
+    <div id="modal-body" class="p-5 overflow-y-auto text-sm leading-relaxed text-ink/90 space-y-3"></div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden">
+  <div class="toast-in flex items-center gap-2 bg-lime text-base font-600 text-sm px-4 py-2.5 rounded-full shadow-lg shadow-lime/20">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+    <span id="toast-msg">Đã sao chép!</span>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   VUNGALISHOP AI HUB — logic
+   ============================================================ */
+
+/* ---- Storage shim: dùng localStorage khi có, fallback bộ nhớ tạm
+   (Trong khung xem trước của Claude, localStorage có thể bị chặn —
+    shim này giúp app không lỗi, và tự chạy chuẩn khi bạn tải file về máy) ---- */
+const store = (() => {
+  try {
+    const k = '__probe__'; localStorage.setItem(k, '1'); localStorage.removeItem(k);
+    return localStorage;
+  } catch (e) {
+    const mem = {};
+    return {
+      getItem: k => (k in mem ? mem[k] : null),
+      setItem: (k, v) => { mem[k] = String(v); },
+      removeItem: k => { delete mem[k]; },
+    };
+  }
+})();
+
+/* ---------- TABS ---------- */
+const tabBtns = document.querySelectorAll('.tab-btn');
+const panels = { learn: 'panel-learn', ai: 'panel-ai', practice: 'panel-practice', shop: 'panel-shop' };
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabBtns.forEach(b => {
+      b.classList.remove('active', 'bg-lime', 'font-600');
+      b.classList.add('text-muted');
+    });
+    btn.classList.add('active', 'bg-lime', 'font-600');
+    btn.classList.remove('text-muted');
+    Object.values(panels).forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(panels[btn.dataset.tab]).classList.add('active');
+  });
+});
+
+/* ---------- BOOT + UPTIME ---------- */
+(function boot() {
+  const el = document.getElementById('boot');
+  const seq = 'khởi tạo core... kb loaded... agent ready';
+  let i = 0;
+  const t = setInterval(() => {
+    el.textContent = seq.slice(0, i++);
+    if (i > seq.length) { clearInterval(t); el.classList.remove('cursor'); }
+  }, 26);
+  const start = Date.now();
+  setInterval(() => {
+    const s = Math.floor((Date.now() - start) / 1000);
+    document.getElementById('uptime').textContent =
+      String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }, 1000);
+})();
+
+/* ---------- TAB 1: LESSONS ---------- */
+const lessons = [
+  {
+    icon: '🤖', tag: 'MODULE_01 · AI/AVATAR', title: 'Tạo KOL AI',
+    summary: 'Dựng một nhân vật ảo có gương mặt, giọng nói và tính cách nhất quán để lên hình thay bạn 24/7.',
+    body: `
+      <p>KOL AI là "gương mặt thương hiệu" do bạn kiểm soát hoàn toàn: không lộ mặt thật, xuất bản không giới hạn, và scale sang nhiều kênh cùng lúc.</p>
+      <p class="text-lime font-mono text-xs">// 4 lớp cần chốt</p>
+      <ul class="list-disc pl-5 space-y-1 marker:text-lime">
+        <li><b>Identity</b> — tên, ngách, chân dung khách hàng, giọng điệu (tone of voice).</li>
+        <li><b>Visual</b> — chân dung nhất quán bằng ảnh tham chiếu + seed cố định.</li>
+        <li><b>Voice</b> — nhân bản giọng (voice clone) để lồng tiếng video hàng loạt.</li>
+        <li><b>Motion</b> — ghép khẩu hình / talking-head để avatar "nói" tự nhiên.</li>
+      </ul>
+      <p>Mẹo: khóa một bộ prompt gốc (base prompt) và chỉ thay bối cảnh — đó là chìa khóa giữ nhân vật không "biến hình" giữa các bài đăng. Prompt mẫu đã có sẵn ở tab <b>Thực Hành</b>.</p>`,
+  },
+  {
+    icon: '⚡', tag: 'MODULE_02 · NO-CODE', title: 'Vibe Coding',
+    summary: 'Ra lệnh bằng ngôn ngữ tự nhiên để AI viết app, tool, landing page — không cần biết code sâu.',
+    body: `
+      <p>Vibe Coding = mô tả ý tưởng, để AI dựng khung, rồi bạn chỉ tinh chỉnh. Bạn quản trị <b>sản phẩm</b>, AI lo phần <b>cú pháp</b>.</p>
+      <p class="text-lime font-mono text-xs">// Vòng lặp 4 bước</p>
+      <ul class="list-disc pl-5 space-y-1 marker:text-lime">
+        <li>Mô tả rõ mục tiêu + ràng buộc (1 file, dark mode, tính năng X…).</li>
+        <li>Cho AI dựng bản nháp chạy được.</li>
+        <li>Test — chỉ ra lỗi/điều muốn đổi bằng lời.</li>
+        <li>Lặp lại đến khi đạt. Luôn xin AI giải thích đoạn bạn chưa hiểu.</li>
+      </ul>
+      <p>Chính web app bạn đang xem là một sản phẩm Vibe Coding: một file duy nhất, tự chạy, tương tác đầy đủ.</p>`,
+  },
+  {
+    icon: '📡', tag: 'MODULE_03 · GROWTH', title: 'Mật mã Traffic',
+    summary: 'Bộ nguyên tắc lách thuật toán & thôi miên người xem để kéo traffic chuyển đổi cao, ổn định.',
+    body: `
+      <p>Traffic không phải may rủi — nó là hệ thống. Ba đòn bẩy cốt lõi:</p>
+      <ul class="list-disc pl-5 space-y-1 marker:text-lime">
+        <li><b>Hook 3 giây</b> — câu/khung hình đầu quyết định người xem ở lại hay lướt.</li>
+        <li><b>Giữ chân (retention)</b> — mỗi câu mở ra một vòng tò mò mới, không để "khoảng chết".</li>
+        <li><b>CTA mềm</b> — điều hướng về link affiliate/sản phẩm một cách tự nhiên, không lộ liễu.</li>
+      </ul>
+      <p class="text-lime font-mono text-xs">// Nguyên tắc nền</p>
+      <p>Một ngách rõ ràng + tần suất đều + tối ưu theo dữ liệu (giữ cái viral, cắt cái flop) sẽ đánh bại việc đăng ngẫu hứng. Checklist SEO đầy đủ nằm ở tab <b>Thực Hành</b>.</p>`,
+  },
+  {
+    icon: '🧠', tag: 'MODULE_04 · AUTOMATION', title: 'Xây dựng AI Agent',
+    summary: 'Ghép các bước lặp đi lặp lại thành một agent tự chạy: nghiên cứu → viết → đăng → báo cáo.',
+    body: `
+      <p>AI Agent là nhân viên số không nghỉ. Thay vì tự làm từng bước, bạn thiết kế <b>quy trình</b> rồi để agent thực thi.</p>
+      <ul class="list-disc pl-5 space-y-1 marker:text-lime">
+        <li><b>Trigger</b> — lịch hẹn giờ, form mới, hay tin nhắn đến.</li>
+        <li><b>Xử lý</b> — gọi LLM để nghiên cứu, viết content, tóm tắt.</li>
+        <li><b>Hành động</b> — ghi vào Google Sheet, gửi mail, đẩy bài lên nền tảng.</li>
+      </ul>
+      <p>Bộ khung Google Apps Script ở tab <b>Thực Hành</b> là một agent mini: đọc dữ liệu từ Sheet và tự động hóa đầu ra.</p>`,
+  },
+  {
+    icon: '💸', tag: 'MODULE_05 · MONETIZE', title: 'Affiliate Tự Động',
+    summary: 'Biến mỗi nội dung thành một điểm bán: đặt đúng sản phẩm, đúng link, đúng thời điểm.',
+    body: `
+      <p>Nội dung hay mà không có đường dẫn tới doanh thu thì chỉ là giải trí. Ba việc phải hệ thống hóa:</p>
+      <ul class="list-disc pl-5 space-y-1 marker:text-lime">
+        <li><b>Chọn sản phẩm</b> — ưu tiên sản phẩm số &amp; mặt hàng thiết yếu, hoa hồng tốt, dễ demo.</li>
+        <li><b>Gắn link thông minh</b> — pinned comment, bio, hoặc landing trung gian.</li>
+        <li><b>Đo lường</b> — theo dõi click/đơn theo từng bài để nhân bản cái hiệu quả.</li>
+      </ul>
+      <p>Kết hợp KOL AI (Module 01) để sản xuất review hàng loạt mà không cần lên hình.</p>`,
+  },
+  {
+    icon: '🏭', tag: 'MODULE_06 · CONTENT', title: 'Content Factory',
+    summary: 'Một ý tưởng gốc → xé nhỏ thành hàng chục nội dung đa nền tảng theo dây chuyền.',
+    body: `
+      <p>Đừng sản xuất từng bài lẻ. Hãy vận hành một <b>dây chuyền</b>:</p>
+      <ul class="list-disc pl-5 space-y-1 marker:text-lime">
+        <li><b>Pillar</b> — 1 chủ đề trụ (video dài / bài viết sâu).</li>
+        <li><b>Atomize</b> — cắt thành short, reels, carousel, thread.</li>
+        <li><b>Repurpose</b> — chỉnh khẩu ngữ cho từng nền tảng (TikTok, Facebook, YouTube).</li>
+        <li><b>Schedule</b> — lên lịch đăng đều để nuôi thuật toán.</li>
+      </ul>
+      <p>Ghép với AI Agent (Module 04) để tự động hóa toàn bộ khâu xé nhỏ &amp; lên lịch.</p>`,
+  },
+];
+
+const grid = document.getElementById('lesson-grid');
+document.getElementById('lesson-count').textContent = lessons.length + ' modules';
+lessons.forEach((l, idx) => {
+  const card = document.createElement('button');
+  card.className = 'card-hover text-left bg-surface border border-line rounded-2xl p-5 flex flex-col group';
+  card.innerHTML = `
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-3xl">${l.icon}</span>
+      <span class="font-mono text-[10px] text-muted/70 group-hover:text-lime/70 transition-colors">${String(idx+1).padStart(2,'0')}</span>
+    </div>
+    <div class="font-mono text-[10px] text-lime/60 mb-1.5">${l.tag}</div>
+    <h3 class="font-display text-lg font-600 mb-2">${l.title}</h3>
+    <p class="text-sm text-muted leading-relaxed flex-1">${l.summary}</p>
+    <span class="mt-4 font-mono text-xs text-lime flex items-center gap-1.5">
+      Mở bài học
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </span>`;
+  card.addEventListener('click', () => openModal(l));
+  grid.appendChild(card);
+});
+
+/* ---------- DỮ LIỆU SẢN PHẨM (Vừng Ali Shop / VungAliShop AI Hub) ---------- */
+/* Mẹo: có thể gắn thêm tham số theo dõi vào link, vd ?utm_source=hub để đo click */
+const PRODUCTS = {
+  system:   { icon:'🚀', name:'VungAliShop AI Hub — Đăng bài tự động', price:'', url:'https://dangbaitudong.cloud/',
+              desc:'Kết nối fanpage, AI viết caption, tự động đăng đúng lịch.' },
+  sara:     { icon:'🖼️', name:'Skill AI Tạo Hình Ảnh Bán Hàng', price:'500.000đ', url:'https://vungalishop.vercel.app/san-pham/sara-model-studio',
+              desc:'Bộ Skill 5-trong-1: ảnh, poster, video sản phẩm — chỉ cần gửi ảnh + yêu cầu tiếng Việt.' },
+  omni:     { icon:'🎬', name:'Tạo Video AI đồng nhất nhân vật', price:'99.000đ', url:'https://vungalishop.vercel.app/san-pham/omni-flow-canvas',
+              desc:'Canvas dựng sẵn trên nền Flow (Google Labs) — tạo video AI nhanh, giữ nhân vật nhất quán.' },
+  video:    { icon:'✂️', name:'Skill Edit Video Tự Động', price:'99.000đ', url:'https://vungalishop.vercel.app/san-pham/skill-edit-video-ai',
+              desc:'Tự transcribe, chèn slide đúng lúc, ghép video talking-head hoàn chỉnh.' },
+  brand:    { icon:'🏷️', name:'Skill Tạo Ảnh Thương Hiệu Cá Nhân', price:'99.000đ', url:'https://vungalishop.vercel.app/san-pham/skill-chinh-sua-anh-ai',
+              desc:'Tự chèn tiêu đề + badge thương hiệu lên ảnh chuẩn phong cách mạng xã hội.' },
+  vip:      { icon:'💎', name:'Kho AI Kinh Doanh VIP', price:'199.000đ', url:'https://vungalishop.vercel.app/san-pham/kho-ai-kinh-doanh-vip',
+              desc:'70+ App AI tạo ảnh/video + kho prompt bán hàng, mở khoá xem ngay.' },
+};
+
+/* Card CTA gắn cuối bài học / công cụ */
+function ctaBox(p) {
+  return `
+    <a href="${p.url}" target="_blank" rel="noopener"
+       class="mt-4 flex items-center justify-between gap-3 bg-lime/8 border border-lime/30 rounded-xl px-4 py-3 hover:border-lime/60 hover:bg-lime/12 transition-colors group no-underline">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="text-xl shrink-0">${p.icon}</span>
+        <div class="min-w-0">
+          <div class="font-mono text-[10px] text-lime/70">💡 CÔNG CỤ LIÊN QUAN</div>
+          <div class="text-sm font-600 truncate">${p.name}${p.price ? ' · <span class="text-lime">'+p.price+'</span>' : ''}</div>
+        </div>
+      </div>
+      <span class="shrink-0 font-mono text-xs text-lime flex items-center gap-1">Xem
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>`;
+}
+
+/* Map: bài học -> sản phẩm gợi ý */
+const lessonCTA = {
+  'Tạo KOL AI': PRODUCTS.sara,
+  'Vibe Coding': PRODUCTS.vip,
+  'Mật mã Traffic': PRODUCTS.vip,
+  'Xây dựng AI Agent': PRODUCTS.system,
+  'Affiliate Tự Động': PRODUCTS.system,
+  'Content Factory': PRODUCTS.video,
+};
+
+/* Render gian hàng (Tab 4) */
+const productGrid = document.getElementById('product-grid');
+[PRODUCTS.sara, PRODUCTS.vip, PRODUCTS.omni, PRODUCTS.video, PRODUCTS.brand].forEach(p => {
+  const a = document.createElement('a');
+  a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+  a.className = 'card-hover bg-surface border border-line rounded-2xl p-5 flex flex-col group no-underline';
+  a.innerHTML = `
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-3xl">${p.icon}</span>
+      ${p.price ? `<span class="font-mono text-xs text-lime border border-lime/30 rounded-full px-2.5 py-1">${p.price}</span>` : ''}
+    </div>
+    <h3 class="font-display text-base font-600 mb-2 leading-snug">${p.name}</h3>
+    <p class="text-sm text-muted leading-relaxed flex-1">${p.desc}</p>
+    <span class="mt-4 font-mono text-xs text-lime flex items-center gap-1.5">
+      Xem chi tiết
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </span>`;
+  productGrid.appendChild(a);
+});
+
+/* ---------- MODAL ---------- */
+const modal = document.getElementById('modal');
+function openModal(l) {
+  document.getElementById('modal-tag').textContent = l.tag;
+  document.getElementById('modal-title').textContent = l.title;
+  const cta = lessonCTA[l.title] ? ctaBox(lessonCTA[l.title]) : '';
+  document.getElementById('modal-body').innerHTML = l.body + cta;
+  modal.classList.remove('hidden'); modal.classList.add('flex');
+}
+function closeModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+document.getElementById('modal-close').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ---------- TAB 2: RAG CHAT ---------- */
+const chatEl = document.getElementById('chat');
+const chipsEl = document.getElementById('chips');
+const inputEl = document.getElementById('chat-input');
+const apikeyEl = document.getElementById('apikey');
+
+/* Nạp lại API key đã lưu */
+apikeyEl.value = store.getItem('kol_api_key') || '';
+document.getElementById('save-key').addEventListener('click', () => {
+  store.setItem('kol_api_key', apikeyEl.value.trim());
+  showToast('Đã lưu API key');
+});
+
+/* Cơ sở tri thức giả lập cho RAG */
+const KB = [
+  { k: ['kol','avatar','nhân vật','ảo'], a: 'Để tạo KOL AI ổn định: (1) khóa Identity — tên, ngách, tone; (2) cố định Visual bằng ảnh tham chiếu + seed; (3) clone Voice để lồng tiếng hàng loạt; (4) ghép Motion cho talking-head. Chìa khóa là giữ MỘT base prompt và chỉ thay bối cảnh. Prompt mẫu nằm ở tab Thực Hành.' },
+  { k: ['traffic','viral','thuật toán','reach','tiếp cận'], a: 'Mật mã traffic gói gọn trong 3 đòn bẩy: Hook 3 giây để giữ người xem, Retention bằng chuỗi vòng tò mò không có khoảng chết, và CTA mềm dẫn về link affiliate tự nhiên. Đăng đều + tối ưu theo dữ liệu quan trọng hơn đăng ngẫu hứng.' },
+  { k: ['affiliate','hoa hồng','bán hàng','tiền','doanh thu'], a: 'Affiliate hiệu quả cần 3 việc hệ thống hóa: chọn sản phẩm số / thiết yếu dễ demo và hoa hồng tốt; gắn link thông minh (pinned comment, bio, landing trung gian); và đo lường click/đơn theo từng bài để nhân bản cái thắng.' },
+  { k: ['agent','tự động','automation','apps script','sheet'], a: 'AI Agent = Trigger (lịch/form/tin nhắn) → Xử lý (gọi LLM để nghiên cứu & viết) → Hành động (ghi Sheet, gửi mail, đăng bài). Khung Google Apps Script ở tab Thực Hành là một agent mini bạn có thể mở rộng ngay.' },
+  { k: ['content','nội dung','kịch bản','video','đăng'], a: 'Vận hành Content Factory theo dây chuyền: 1 Pillar → Atomize thành short/reels/carousel → Repurpose theo từng nền tảng → Schedule đăng đều. Ghép với AI Agent để tự động hóa khâu xé nhỏ và lên lịch.' },
+  { k: ['code','vibe','app','lập trình','tool'], a: 'Vibe Coding: mô tả rõ mục tiêu + ràng buộc, để AI dựng bản chạy được, rồi test và tinh chỉnh bằng lời cho tới khi đạt. Bạn quản sản phẩm, AI lo cú pháp — luôn xin AI giải thích đoạn bạn chưa hiểu.' },
+  { k: ['forex','vàng','chỉ số','trading','đầu tư'], a: 'Với nội dung tài chính (forex/vàng/chỉ số): tách bạch phần "kiến thức giáo dục" và phần "quan điểm cá nhân", luôn kèm cảnh báo rủi ro, và dùng dữ liệu/biểu đồ để tăng độ tin cậy. Đây là ngách thu hút traffic chất lượng cao nếu làm chuẩn mực.' },
+];
+const DEFAULT_A = 'Mình là trợ lý RAG của Hub. Mình có thể trả lời sâu về: tạo KOL AI, mật mã traffic, affiliate tự động, xây AI Agent, content factory và vibe coding. Bạn cứ hỏi cụ thể một chủ đề nhé!';
+
+/* ====== GỌI GEMINI API (BYOK — mỗi người dùng tự nhập key của họ) ======
+   - CÓ key   -> gọi Gemini thật, key lấy từ ô nhập (không lưu key của bạn trong file).
+   - CHƯA key -> chạy demo cục bộ (KB giả lập) để app vẫn xem/thử được.
+
+   Model mặc định: gemini-3.6-flash (cân bằng giá/chất lượng).
+   Muốn RẺ NHẤT  -> đổi GEMINI_MODEL = 'gemini-3.5-flash-lite'.
+
+   >>> Để làm RAG thật: nhồi các đoạn tài liệu liên quan vào biến SYSTEM_PROMPT
+       (hoặc thêm một part text riêng trong contents) trước khi gửi. */
+const GEMINI_MODEL = 'gemini-3.6-flash';
+
+/* "Bộ nhớ nền" định hình vai trò trợ lý — đây là chỗ nhồi tri thức/RAG của bạn */
+const SYSTEM_PROMPT =
+`Bạn là trợ lý tri thức của "VungAliShop AI Hub", phục vụ một solopreneur người Việt \
+làm creator/affiliate trên Facebook, TikTok và đầu tư tài chính (forex, vàng, chỉ số).
+Chuyên môn: tạo KOL AI, mật mã traffic, affiliate tự động, xây AI Agent, content factory, vibe coding.
+Trả lời NGẮN GỌN, thực chiến, đi thẳng vào hành động, bằng tiếng Việt.
+Viết văn xuôi thuần, hạn chế markdown. Không lan man, không rào đón dài dòng.`;
+
+async function callRAG(query) {
+  const key = (apikeyEl.value.trim() || store.getItem('kol_api_key') || '').trim();
+
+  /* --- Chưa có key: chạy demo cục bộ để app vẫn hoạt động --- */
+  if (!key) {
+    await new Promise(r => setTimeout(r, 450));
+    const q = query.toLowerCase();
+    const hit = KB.find(item => item.k.some(kw => q.includes(kw)));
+    return (hit ? hit.a : DEFAULT_A)
+      + '\n\n(⚙️ Đang chạy demo cục bộ — nhập Gemini API key ở trên rồi bấm "Lưu key" để dùng AI thật.)';
+  }
+
+  /* --- Có key: gọi Gemini thật --- */
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [{ role: 'user', parts: [{ text: query }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 600 }
+      })
+    });
+
+    if (!res.ok) {
+      if (res.status === 400 || res.status === 403)
+        return '⚠️ API key không hợp lệ hoặc chưa bật quyền. Kiểm tra lại key tại Google AI Studio.';
+      if (res.status === 429)
+        return '⚠️ Đã chạm giới hạn lượt (rate limit / hết quota free). Chờ chút rồi thử lại.';
+      return '⚠️ Lỗi Gemini (mã ' + res.status + '). Thử lại sau nhé.';
+    }
+
+    const data = await res.json();
+    const text = (data.candidates && data.candidates[0]
+      && data.candidates[0].content && data.candidates[0].content.parts
+      || []).map(p => p.text || '').join('');
+    return text || 'Mình chưa nhận được nội dung trả về. Thử hỏi lại theo cách khác nhé.';
+  } catch (e) {
+    return '⚠️ Không gọi được API (có thể do mạng, hoặc CORS trong khung xem trước của Claude). '
+      + 'Khi anh tải file về / deploy lên hosting thật thì sẽ chạy bình thường.';
+  }
+}
+
+const SUGGESTIONS = [
+  'Cách tạo KOL AI giữ mặt nhất quán?',
+  'Bí quyết viết hook 3 giây kéo traffic?',
+  'Chọn sản phẩm affiliate thế nào cho dễ bán?',
+  'Xây AI Agent tự đăng bài ra sao?',
+  'Content Factory vận hành như thế nào?',
+  'Vibe Coding bắt đầu từ đâu?',
+];
+
+function bubble(role, text, typing = false) {
+  const wrap = document.createElement('div');
+  wrap.className = 'flex ' + (role === 'user' ? 'justify-end' : 'justify-start');
+  const b = document.createElement('div');
+  if (role === 'user') {
+    b.className = 'max-w-[80%] bg-lime text-base rounded-2xl rounded-br-sm px-4 py-2.5 text-sm font-500';
+    b.textContent = text;
+  } else {
+    b.className = 'max-w-[85%] bg-elevated border border-line rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-relaxed text-ink/90';
+    if (!typing) b.textContent = text;
+  }
+  wrap.appendChild(b);
+  chatEl.appendChild(wrap);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  return b;
+}
+
+function typeInto(el, text) {
+  return new Promise(resolve => {
+    el.classList.add('cursor');
+    // Câu càng dài -> hiện càng nhiều ký tự mỗi nhịp, để không "gõ" lê thê
+    const step = Math.max(1, Math.ceil(text.length / 450));
+    let i = 0;
+    const t = setInterval(() => {
+      i += step;
+      el.textContent = text.slice(0, i);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      if (i >= text.length) { clearInterval(t); el.textContent = text; el.classList.remove('cursor'); resolve(); }
+    }, 14);
+  });
+}
+
+function renderChips() {
+  chipsEl.innerHTML = '';
+  // chọn ngẫu nhiên 3 gợi ý
+  const pool = [...SUGGESTIONS].sort(() => Math.random() - 0.5).slice(0, 3);
+  pool.forEach(text => {
+    const c = document.createElement('button');
+    c.className = 'chip font-mono text-[11px] text-muted border border-line rounded-full px-3 py-1.5 bg-base/60';
+    c.textContent = '↳ ' + text;
+    c.addEventListener('click', () => { inputEl.value = text; sendMessage(); });
+    chipsEl.appendChild(c);
+  });
+}
+
+let busy = false;
+async function sendMessage() {
+  const q = inputEl.value.trim();
+  if (!q || busy) return;
+  busy = true;
+  inputEl.value = '';
+  chipsEl.innerHTML = '';
+  bubble('user', q);
+
+  const thinking = bubble('assistant', '', true);
+  thinking.innerHTML = '<span class="font-mono text-xs text-muted">đang truy vấn kb</span> <span class="cursor"></span>';
+
+  const answer = await callRAG(q);
+  thinking.innerHTML = '';
+  await typeInto(thinking, answer);
+
+  renderChips();
+  busy = false;
+  inputEl.focus();
+}
+
+document.getElementById('send').addEventListener('click', sendMessage);
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+document.getElementById('clear-chat').addEventListener('click', () => { chatEl.innerHTML = ''; greet(); });
+
+async function greet() {
+  const b = bubble('assistant', '', true);
+  await typeInto(b, 'Xin chào 👋 Mình là trợ lý RAG của VungAliShop AI Hub. Hỏi mình về tạo KOL AI, traffic, affiliate hay AI Agent — hoặc bấm một gợi ý bên dưới.');
+  renderChips();
+}
+greet();
+
+/* ---------- TAB 3: TOOLS ---------- */
+const tools = [
+  {
+    tag: 'TOOL_01 · PROMPT', title: 'Prompt tạo KOL AI',
+    desc: 'Prompt gốc giữ nhân vật nhất quán qua mọi bài đăng. Điền phần trong [ ] rồi chỉ đổi bối cảnh.',
+    lang: 'prompt',
+    code:
+`Bạn là đạo diễn hình ảnh cho một KOL ảo. Tạo mô tả nhân vật NHẤT QUÁN tuyệt đối:
+
+# NHÂN VẬT
+- Tên: [Sara]
+- Giới tính / tuổi: [nữ, 25]
+- Ngoại hình: [tóc đen dài, mắt nâu, da sáng, gương mặt Á Đông thanh tú]
+- Trang phục nhận diện: [áo thun vàng chanh, tối giản]
+- Tính cách / tone: [năng lượng, chuyên nghiệp, thân thiện]
+
+# BỐI CẢNH (chỉ thay phần này giữa các bài)
+- Cảnh: [đang review sản phẩm số trong studio nền tối]
+- Cảm xúc: [tự tin, cuốn hút]
+- Bố cục: chân dung 3/4, ánh sáng viền, độ nét cao
+
+# RÀNG BUỘC
+- Giữ nguyên gương mặt, kiểu tóc, màu áo ở MỌI ảnh (dùng cùng seed).
+- Phong cách: điện ảnh, 8k, ánh sáng mềm.
+- KHÔNG đổi đường nét khuôn mặt.
+
+Xuất: 1 đoạn prompt hình ảnh + 3 biến thể bối cảnh giữ nguyên nhân vật.`,
+  },
+  {
+    tag: 'TOOL_02 · APPS SCRIPT', title: 'Mã Google Apps Script',
+    desc: 'Agent mini: đọc ý tưởng content từ Google Sheet, gắn nhãn trạng thái và gửi email nhắc lịch đăng.',
+    lang: 'javascript',
+    code:
+`/**
+ * KOL Agent — quét Sheet "ContentPlan", đánh dấu bài tới hạn
+ * và gửi email nhắc lịch đăng. Cột: A=Ngày | B=Chủ đề | C=Nền tảng | D=Trạng thái
+ */
+function runKolAgent() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ContentPlan');
+  const data = sheet.getDataRange().getValues();
+  const today = new Date();
+  const due = [];
+
+  for (var i = 1; i < data.length; i++) {
+    var ngay = new Date(data[i][0]);
+    var trangThai = data[i][3];
+    if (trangThai !== 'Đã đăng' && isSameDay(ngay, today)) {
+      sheet.getRange(i + 1, 4).setValue('Tới hạn hôm nay');
+      due.push('• ' + data[i][1] + ' (' + data[i][2] + ')');
+    }
+  }
+
+  if (due.length > 0) {
+    MailApp.sendEmail({
+      to: Session.getActiveUser().getEmail(),
+      subject: '[KOL Agent] ' + due.length + ' bài cần đăng hôm nay',
+      body: 'Lịch đăng hôm nay:\\n\\n' + due.join('\\n')
+    });
+  }
+}
+
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+// Cài trigger chạy tự động mỗi sáng 8h:
+function setupTrigger() {
+  ScriptApp.newTrigger('runKolAgent').timeBased().everyDays(1).atHour(8).create();
+}`,
+  },
+  {
+    tag: 'TOOL_03 · CHECKLIST', title: 'Checklist SEO Traffic',
+    desc: 'Rà soát trước khi bấm đăng — tối ưu để bài lọt đề xuất và giữ chân người xem.',
+    lang: 'checklist',
+    code:
+`CHECKLIST SEO & TRAFFIC — RÀ TRƯỚC KHI ĐĂNG
+
+[ ] Hook 3 giây đầu: câu/hình ảnh gây tò mò hoặc chạm nỗi đau
+[ ] Tiêu đề chứa từ khóa chính + con số / lời hứa cụ thể
+[ ] Mô tả 2-3 dòng đầu có từ khóa (quan trọng cho SEO)
+[ ] 3-5 hashtag: trộn hashtag rộng + hashtag ngách
+[ ] Không có "khoảng chết" — mỗi 3-5 giây có một điểm nhấn mới
+[ ] CTA rõ ràng ở cuối (lưu / bình luận / bấm link)
+[ ] Link affiliate đặt ở pinned comment hoặc bio
+[ ] Thumbnail / ảnh bìa tương phản cao, chữ to dễ đọc trên mobile
+[ ] Độ dài phù hợp nền tảng (short 15-40s, reels, v.v.)
+[ ] Caption khơi bình luận (đặt 1 câu hỏi cho người xem)
+[ ] Đăng đúng khung giờ vàng của tệp khán giả
+[ ] Sau 24h: xem retention, nhân bản bài giữ chân tốt`,
+  },
+];
+
+const toolList = document.getElementById('tool-list');
+const toolCTA = [PRODUCTS.sara, PRODUCTS.system, PRODUCTS.vip]; // theo thứ tự 3 tool
+tools.forEach((t, idx) => {
+  const block = document.createElement('div');
+  block.className = 'bg-surface border border-line rounded-2xl overflow-hidden';
+  block.innerHTML = `
+    <div class="flex items-start justify-between gap-3 p-4 border-b border-line">
+      <div>
+        <div class="font-mono text-[10px] text-lime/60 mb-1">${t.tag}</div>
+        <h3 class="font-display text-lg font-600">${t.title}</h3>
+        <p class="text-sm text-muted mt-1">${t.desc}</p>
+      </div>
+      <button data-copy="${idx}" class="copy-btn shrink-0 flex items-center gap-1.5 font-mono text-xs px-3 py-2 rounded-lg bg-elevated border border-line hover:border-lime/50 hover:text-lime transition-colors">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy
+      </button>
+    </div>
+    <pre class="tool-code overflow-x-auto p-4 text-[12.5px] leading-relaxed font-mono text-ink/85 bg-base/40"></pre>
+    <div class="px-4 pb-4 -mt-1">${toolCTA[idx] ? ctaBox(toolCTA[idx]) : ''}</div>`;
+  // Đặt code an toàn bằng textContent (tránh mọi vấn đề escaping)
+  block.querySelector('.tool-code').textContent = t.code;
+  toolList.appendChild(block);
+});
+
+/* Copy an toàn: thử Clipboard API, fallback execCommand */
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) { return false; }
+}
+
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const idx = +btn.dataset.copy;
+    const ok = await copyText(tools[idx].code);
+    if (ok) {
+      showToast('Đã sao chép ' + tools[idx].title);
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Đã copy';
+      btn.classList.add('text-lime', 'border-lime/50');
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('text-lime', 'border-lime/50'); }, 1600);
+    } else {
+      showToast('Không copy được — hãy bôi đen thủ công');
+    }
+  });
+});
+
+/* ---------- TOAST ---------- */
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.add('hidden'), 2200);
+}
+
+/* ---------- FOOTER: LEAD CAPTURE + SHARE ---------- */
+const ZALO_GROUP = 'https://zalo.me/g/drxyl1aua4e0tqdme76y';
+
+/* >>> DÁN URL WEB APP APPS SCRIPT CỦA BẠN VÀO ĐÂY (kết thúc bằng /exec)
+   Lead sẽ được ghi thẳng vào Google Sheet thu khách của trang bán hàng.
+   Nếu để trống, form vẫn hoạt động: xác nhận + mở nhóm Zalo. */
+const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzpQfo65QuFnrc3PLIWjGxnc_RFsfWDICQflvOrfB5KATaj4Xi0JjQoLa9euebi3Muy/exec';
+
+document.getElementById('lead-submit').addEventListener('click', async () => {
+  const name    = document.getElementById('lead-name').value.trim();
+  const phone   = document.getElementById('lead-phone').value.trim();
+  const service = document.getElementById('lead-service').value;
+
+  if (name.length < 2)         { showToast('Nhập giúp mình họ tên nhé'); return; }
+  if (!/^[0-9+\s.]{8,}$/.test(phone)) { showToast('Nhập số điện thoại hợp lệ nhé'); return; }
+
+  const btn = document.getElementById('lead-submit');
+  btn.disabled = true; btn.textContent = 'Đang gửi…';
+
+  // Ghi vào Google Sheet (nếu đã cấu hình endpoint)
+  if (LEAD_ENDPOINT) {
+    try {
+      await fetch(LEAD_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors', // Apps Script không trả CORS -> gửi kiểu no-cors, vẫn thêm dòng thành công
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          hoten: name,
+          sodienthoai: phone,
+          dichvu: service,
+          loinhan: 'Đăng ký từ VungAliShop AI Hub'
+        })
+      });
+    } catch (e) { /* no-cors nên không đọc được kết quả; bỏ qua lỗi mềm */ }
+  }
+
+  store.setItem('kol_lead', JSON.stringify({ name, phone, service })); // lưu tạm phía client
+  showToast('Cảm ơn ' + name + '! Đang mở nhóm Zalo…');
+  setTimeout(() => window.open(ZALO_GROUP, '_blank', 'noopener'), 800);
+  document.getElementById('lead-name').value = '';
+  document.getElementById('lead-phone').value = '';
+  btn.disabled = false; btn.textContent = 'Nhận quà';
+});
+
+/* Chia sẻ: dùng Web Share API, fallback copy link */
+document.getElementById('share-btn').addEventListener('click', async () => {
+  const shareData = {
+    title: 'VungAliShop AI Hub',
+    text: 'Bộ công cụ AI cho KOL & affiliate — học tập, tra cứu AI và công cụ thực chiến.',
+    url: window.location.href,
+  };
+  try {
+    if (navigator.share) { await navigator.share(shareData); return; }
+  } catch (e) { return; } // người dùng huỷ -> im lặng
+  const ok = await copyText(window.location.href);
+  showToast(ok ? 'Đã copy link — dán chia sẻ ngay!' : 'Hãy copy link trên thanh địa chỉ');
+});
+</script>
+</body>
+</html>
