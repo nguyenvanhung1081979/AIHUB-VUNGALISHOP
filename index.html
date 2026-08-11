@@ -182,6 +182,32 @@
     </div>
 
     <div class="max-w-3xl mx-auto">
+      <!-- Trợ lý tri thức trỏ thẳng vào Gemini Notebook -->
+      <a href="https://notebook.google.com/notebook/00b1b42d-65fd-42ad-b00b-2b040394dbc5" target="_blank" rel="noopener"
+         class="card-hover block bg-gradient-to-br from-lime/12 via-surface to-surface border border-lime/40 rounded-2xl p-6 mb-6 group">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div class="flex items-start gap-4">
+            <span class="text-3xl shrink-0">📓</span>
+            <div>
+              <div class="font-mono text-[11px] text-lime/80 mb-1">★ TRỢ LÝ TRI THỨC · GEMINI NOTEBOOK</div>
+              <h3 class="font-display text-xl font-600 mb-1">Hỏi trực tiếp kho tri thức của VungAliShop</h3>
+              <p class="text-sm text-muted max-w-lg">Trợ lý chạy trên Gemini Notebook, trả lời <b>bám đúng tài liệu gốc</b> của hệ thống — có trích dẫn nguồn. Bấm để mở và đặt câu hỏi.</p>
+            </div>
+          </div>
+          <span class="shrink-0 inline-flex items-center gap-2 bg-lime text-base font-600 text-sm px-5 py-3 rounded-xl group-hover:bg-lime-bright transition-colors">
+            Mở trợ lý tri thức
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- Dải phân cách -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="flex-1 h-px bg-line"></div>
+        <span class="font-mono text-[11px] text-muted">— hoặc hỏi nhanh bằng Gemini —</span>
+        <div class="flex-1 h-px bg-line"></div>
+      </div>
+
       <!-- API key -->
       <div class="flex flex-col sm:flex-row gap-2 mb-4">
         <div class="relative flex-1">
@@ -217,7 +243,7 @@
             </button>
           </div>
           <p class="font-mono text-[10px] text-muted/70 mt-2 px-1">
-            * Đã nối <span class="text-lime/70">Gemini API</span> (model gemini-3.6-flash). Chưa nhập key → chạy demo cục bộ; nhập key của bạn → dùng AI thật.
+            * Tra cứu <span class="text-lime/70">trong kho tri thức của bạn</span> — không cần API key. Nhập key Gemini (tuỳ chọn) để AI trả lời mượt hơn dựa trên đúng bài viết.
           </p>
         </div>
       </div>
@@ -600,27 +626,65 @@ document.getElementById('save-key').addEventListener('click', () => {
   showToast('Đã lưu API key');
 });
 
-/* Cơ sở tri thức giả lập cho RAG */
-const KB = [
-  { k: ['kol','avatar','nhân vật','ảo'], a: 'Để tạo KOL AI ổn định: (1) khóa Identity — tên, ngách, tone; (2) cố định Visual bằng ảnh tham chiếu + seed; (3) clone Voice để lồng tiếng hàng loạt; (4) ghép Motion cho talking-head. Chìa khóa là giữ MỘT base prompt và chỉ thay bối cảnh. Prompt mẫu nằm ở tab Thực Hành.' },
-  { k: ['traffic','viral','thuật toán','reach','tiếp cận'], a: 'Mật mã traffic gói gọn trong 3 đòn bẩy: Hook 3 giây để giữ người xem, Retention bằng chuỗi vòng tò mò không có khoảng chết, và CTA mềm dẫn về link affiliate tự nhiên. Đăng đều + tối ưu theo dữ liệu quan trọng hơn đăng ngẫu hứng.' },
-  { k: ['affiliate','hoa hồng','bán hàng','tiền','doanh thu'], a: 'Affiliate hiệu quả cần 3 việc hệ thống hóa: chọn sản phẩm số / thiết yếu dễ demo và hoa hồng tốt; gắn link thông minh (pinned comment, bio, landing trung gian); và đo lường click/đơn theo từng bài để nhân bản cái thắng.' },
-  { k: ['agent','tự động','automation','apps script','sheet'], a: 'AI Agent = Trigger (lịch/form/tin nhắn) → Xử lý (gọi LLM để nghiên cứu & viết) → Hành động (ghi Sheet, gửi mail, đăng bài). Khung Google Apps Script ở tab Thực Hành là một agent mini bạn có thể mở rộng ngay.' },
-  { k: ['content','nội dung','kịch bản','video','đăng'], a: 'Vận hành Content Factory theo dây chuyền: 1 Pillar → Atomize thành short/reels/carousel → Repurpose theo từng nền tảng → Schedule đăng đều. Ghép với AI Agent để tự động hóa khâu xé nhỏ và lên lịch.' },
-  { k: ['code','vibe','app','lập trình','tool'], a: 'Vibe Coding: mô tả rõ mục tiêu + ràng buộc, để AI dựng bản chạy được, rồi test và tinh chỉnh bằng lời cho tới khi đạt. Bạn quản sản phẩm, AI lo cú pháp — luôn xin AI giải thích đoạn bạn chưa hiểu.' },
-  { k: ['forex','vàng','chỉ số','trading','đầu tư'], a: 'Với nội dung tài chính (forex/vàng/chỉ số): tách bạch phần "kiến thức giáo dục" và phần "quan điểm cá nhân", luôn kèm cảnh báo rủi ro, và dùng dữ liệu/biểu đồ để tăng độ tin cậy. Đây là ngách thu hút traffic chất lượng cao nếu làm chuẩn mực.' },
+/* ============================================================
+   KHO TRI THỨC CỦA BẠN (tự viết bằng lời của mình — không vi phạm bản quyền)
+   Mỗi mục: { title, k:[từ khoá để tìm], a: nội dung đầy đủ }
+   >>> THÊM BÀI MỚI: copy một khối {…} rồi điền nội dung của bạn.
+   ============================================================ */
+const KNOWLEDGE = [
+  {
+    title: 'Cách dùng phần mềm Focusy để quay màn hình',
+    k: ['focusy','quay màn hình','ghi màn hình','screen record','auto-cut','auto cut','zoom','edit video','xuất video','record'],
+    a:
+`Focusy là phần mềm quay màn hình và chỉnh sửa video tự động bằng AI, mạnh nhất ở khả năng tự động zoom bám theo con chuột và tự cắt bỏ đoạn ậm ừ — đỡ phải edit thủ công.
+
+BƯỚC 1 — Thiết lập âm thanh & camera trước khi quay
+• Loa (System Audio): chọn Speak Audio để thu chính xác âm thanh phát ra từ hệ thống máy tính.
+• Micro: kết nối mic ngoài (Wireless Go / mic của webcam) để giọng rõ và nội lực.
+• Webcam: muốn video không lộ mặt thì tắt webcam; nếu bật, đặt camera ở góc (vd trên cùng bên phải) và bo tròn góc cho đẹp mắt.
+
+BƯỚC 2 — Chọn khung hình & bắt đầu quay
+• Tỉ lệ: Full Screen (toàn màn hình); video ngắn TikTok/Reels chọn dọc 9:16; YouTube chọn ngang 16:9.
+• Bấm Continue → phần mềm đếm ngược 3-2-1 rồi bắt đầu ghi hình.
+
+BƯỚC 3 — Quay màn hình với hiệu ứng zoom tự động
+• Di chuột tới đâu, Focusy tự zoom cận cảnh vào đó — giúp người xem dễ theo dõi và tập trung.
+• Chỉnh lại zoom level trong bảng điều khiển để hiệu ứng mượt và nhẹ hơn.
+
+BƯỚC 4 — Chỉnh sửa tự động bằng AI (Auto-Edit)
+• Auto-cut: chỉ 1 click, AI tự quét và xoá sạch đoạn thừa, khoảng lặng, tiếng ậm ừ.
+• Con chuột: chỉnh to/nhỏ, đổi hiệu ứng (ngón tay, bút chì, "nở hoa" mỗi khi click).
+• Bối cảnh: đổi background, làm mờ nền webcam, hoặc thêm AI Avatar nói ở góc màn hình.
+
+BƯỚC 5 — Xuất video chất lượng cao
+• Định dạng: MP4.
+• Độ phân giải: 1080p / 2K / tối đa 4K cho thước phim sắc nét, chuyên nghiệp.`
+  },
 ];
-const DEFAULT_A = 'Mình là trợ lý RAG của Hub. Mình có thể trả lời sâu về: tạo KOL AI, mật mã traffic, affiliate tự động, xây AI Agent, content factory và vibe coding. Bạn cứ hỏi cụ thể một chủ đề nhé!';
 
-/* ====== GỌI GEMINI API (BYOK — mỗi người dùng tự nhập key của họ) ======
-   - CÓ key   -> gọi Gemini thật, key lấy từ ô nhập (không lưu key của bạn trong file).
-   - CHƯA key -> chạy demo cục bộ (KB giả lập) để app vẫn xem/thử được.
+/* Tìm trong kho tri thức: chấm điểm theo từ khoá + tiêu đề, trả về bài khớp nhất */
+function searchKB(query) {
+  const q = query.toLowerCase();
+  let best = null, bestScore = 0;
+  KNOWLEDGE.forEach(item => {
+    let score = 0;
+    (item.k || []).forEach(kw => { if (q.includes(kw)) score += 2; });
+    (item.title || '').toLowerCase().split(/[\s,–-]+/).forEach(w => {
+      if (w.length > 2 && q.includes(w)) score += 1;
+    });
+    if (score > bestScore) { bestScore = score; best = item; }
+  });
+  return bestScore > 0 ? best : null;
+}
 
-   Model mặc định: gemini-3.6-flash (cân bằng giá/chất lượng).
-   Muốn RẺ NHẤT  -> đổi GEMINI_MODEL = 'gemini-3.5-flash-lite'.
+const DEFAULT_A = 'Mình chưa tìm thấy mục nào khớp trong kho tri thức. Bạn thử hỏi bằng từ khoá khác, hoặc bấm một gợi ý bên dưới nhé. (Chủ kênh có thể bổ sung thêm bài viết vào kho bất cứ lúc nào.)';
 
-   >>> Để làm RAG thật: nhồi các đoạn tài liệu liên quan vào biến SYSTEM_PROMPT
-       (hoặc thêm một part text riêng trong contents) trước khi gửi. */
+/* ====== TRA CỨU KHO TRI THỨC (mặc định) + GEMINI (tuỳ chọn) ======
+   - KHÔNG key -> tra cứu trong KNOWLEDGE, trả về đúng bài. Miễn phí, không cần gì.
+   - CÓ key    -> Gemini trả lời mượt hơn nhưng BÁM tài liệu khớp (RAG thật), key lấy từ ô nhập.
+
+   Model mặc định: gemini-3.6-flash. Muốn RẺ NHẤT -> 'gemini-3.5-flash-lite'.
+   >>> Mở rộng kho: thêm mục vào mảng KNOWLEDGE ở trên. */
 const GEMINI_MODEL = 'gemini-3.6-flash';
 
 /* "Bộ nhớ nền" định hình vai trò trợ lý — đây là chỗ nhồi tri thức/RAG của bạn */
@@ -633,26 +697,29 @@ Viết văn xuôi thuần, hạn chế markdown. Không lan man, không rào đ�
 
 async function callRAG(query) {
   const key = (apikeyEl.value.trim() || store.getItem('kol_api_key') || '').trim();
+  const hit = searchKB(query); // bài khớp nhất trong kho tri thức của bạn
 
-  /* --- Chưa có key: chạy demo cục bộ để app vẫn hoạt động --- */
+  /* --- KHÔNG cần key: tra cứu ngay trong kho tri thức, trả về đúng bài --- */
   if (!key) {
-    await new Promise(r => setTimeout(r, 450));
-    const q = query.toLowerCase();
-    const hit = KB.find(item => item.k.some(kw => q.includes(kw)));
-    return (hit ? hit.a : DEFAULT_A)
-      + '\n\n(⚙️ Đang chạy demo cục bộ — nhập Gemini API key ở trên rồi bấm "Lưu key" để dùng AI thật.)';
+    await new Promise(r => setTimeout(r, 350));
+    if (hit) return '📌 ' + hit.title + '\n\n' + hit.a;
+    return DEFAULT_A;
   }
 
-  /* --- Có key: gọi Gemini thật --- */
+  /* --- Có key: Gemini trả lời DỰA TRÊN bài khớp (RAG thật) --- */
+  const grounding = hit
+    ? '\n\n--- TÀI LIỆU GỐC (chỉ trả lời dựa trên nội dung này, không bịa) ---\n' + hit.title + '\n' + hit.a
+    : '\n\n(Không tìm thấy tài liệu khớp trong kho. Nếu câu hỏi ngoài phạm vi, hãy nói bạn chưa có thông tin.)';
+
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent';
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT + grounding }] },
         contents: [{ role: 'user', parts: [{ text: query }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 600 }
+        generationConfig: { temperature: 0.4, maxOutputTokens: 600 }
       })
     });
 
@@ -676,12 +743,11 @@ async function callRAG(query) {
 }
 
 const SUGGESTIONS = [
-  'Cách tạo KOL AI giữ mặt nhất quán?',
-  'Bí quyết viết hook 3 giây kéo traffic?',
-  'Chọn sản phẩm affiliate thế nào cho dễ bán?',
-  'Xây AI Agent tự đăng bài ra sao?',
-  'Content Factory vận hành như thế nào?',
-  'Vibe Coding bắt đầu từ đâu?',
+  'Cách quay màn hình bằng Focusy?',
+  'Focusy cắt tiếng ậm ừ tự động thế nào?',
+  'Nên xuất video Focusy ở độ phân giải nào?',
+  'Thiết lập mic và webcam trong Focusy ra sao?',
+  'Quay video dọc 9:16 cho TikTok bằng Focusy?',
 ];
 
 function bubble(role, text, typing = false) {
@@ -692,7 +758,7 @@ function bubble(role, text, typing = false) {
     b.className = 'max-w-[80%] bg-lime text-base rounded-2xl rounded-br-sm px-4 py-2.5 text-sm font-500';
     b.textContent = text;
   } else {
-    b.className = 'max-w-[85%] bg-elevated border border-line rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-relaxed text-ink/90';
+    b.className = 'max-w-[85%] bg-elevated border border-line rounded-2xl rounded-bl-sm px-4 py-3 text-sm leading-relaxed text-ink/90 whitespace-pre-wrap';
     if (!typing) b.textContent = text;
   }
   wrap.appendChild(b);
@@ -756,7 +822,7 @@ document.getElementById('clear-chat').addEventListener('click', () => { chatEl.i
 
 async function greet() {
   const b = bubble('assistant', '', true);
-  await typeInto(b, 'Xin chào 👋 Mình là trợ lý RAG của VungAliShop AI Hub. Hỏi mình về tạo KOL AI, traffic, affiliate hay AI Agent — hoặc bấm một gợi ý bên dưới.');
+  await typeInto(b, 'Xin chào 👋 Đây là công cụ tra cứu kho tri thức của VungAliShop AI Hub. Gõ câu hỏi để mình tìm đúng bài hướng dẫn cho bạn — hoặc bấm một gợi ý bên dưới.');
   renderChips();
 }
 greet();
