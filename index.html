@@ -680,7 +680,7 @@ TÓM LẠI: mô hình càng dễ bắt đầu (KOL AI, Clipping) càng hợp ng�
   },
   {
     title: 'Cách viết prompt hiệu quả & đóng gói "Skill" cho Claude',
-    k: ['prompt','viết prompt','câu lệnh','cau lenh','ra lệnh','ra lệnh cho ai','claude','claude code','skill','claude skill','đóng gói','dong goi','đóng gói skill','mọi thứ giữ nguyên','project','bộ nhớ','brand voice','dạy ai','huấn luyện ai'],
+    k: ['prompt','viết prompt','câu lệnh','cau lenh','ra lệnh','ra lệnh cho ai','claude code','claude skill','đóng gói','dong goi','đóng gói skill','mọi thứ giữ nguyên','project','bộ nhớ','brand voice','dạy ai','huấn luyện ai'],
     a:
 `I. TƯ DUY CỐT LÕI KHI VIẾT PROMPT CHO CLAUDE
 
@@ -752,6 +752,40 @@ QUY TRÌNH 4 BƯỚC CHUẨN:
 
 LỢI ÍCH: kiểm soát chất lượng từng công đoạn, dễ tinh chỉnh, và sẵn sàng đóng gói vào các quy trình tự động hóa (Make.com, AI Agent).`
   },
+  {
+    title: 'Cách nạp / cài Skill vào Claude (Project, Cowork, từ ChatGPT)',
+    k: ['nạp skill','nap skill','cài skill','cai skill','cài đặt skill','install skill','load skill','đưa skill vào claude','nạp file','claude cowork','cowork','dự án claude','chuyển skill','skill từ chatgpt','kích hoạt skill','gọi skill','phím tắt skill'],
+    a:
+`Cách nạp một "Skill" (kỹ năng) vào Claude để tự động hóa các tác vụ lặp lại theo quy trình.
+
+I. CHUẨN BỊ FILE SKILL HOÀN CHỈNH
+Đóng gói quy trình thành một file văn bản tĩnh gồm 5 yếu tố nền tảng:
+• Màu sắc thương hiệu (Brand Colors): tông màu chủ đạo của sản phẩm/giao diện.
+• Nhân vật đại diện (Persona): vai trò, tiếng nói thương hiệu, giọng văn của AI.
+• Phong cách (Style): cách trình bày (kể chuyện, tối giản, chuyên nghiệp...).
+• Quy trình mỗi ngày (Daily Workflow): từng bước xử lý đầu vào và đầu ra.
+• Kiểm tra (Testing): quy chuẩn rà soát cuối để kết quả luôn đồng nhất, đúng ý.
+
+II. CÁC CÁCH NẠP SKILL VÀO CLAUDE
+
+Cách 1 — Qua tính năng Dự án (Project) trên Claude Chat (web):
+1. Tạo một Project mới trong tài khoản Claude.
+2. Vào cài đặt của Project và nạp file Skill đã soạn sẵn vào đó.
+3. Claude tự học, ghi nhớ và vận hành theo "Bộ nhớ" của dự án (quy trình, tiếng nói thương hiệu, dữ liệu sản phẩm) mà không cần nhập lại hướng dẫn.
+
+Cách 2 — Qua Claude Cowork (bản Desktop):
+1. Mở ứng dụng Claude Cowork trên máy tính.
+2. Tạo/trỏ đường dẫn đến thư mục làm việc riêng để lưu dữ liệu trực tiếp.
+3. Đẩy file Skill vào thư mục dự án đó.
+4. Gõ lệnh: "Cài skill này cho tôi" để hệ thống tự nhận diện và tích hợp.
+
+Cách 3 — Kế thừa Skill từ ChatGPT sang Claude:
+• Tạo, huấn luyện và đóng gói Skill trên ChatGPT trước.
+• Xuất và tải file Skill về máy dưới dạng file văn bản.
+• Nạp file đó vào Claude để AI kế thừa và dùng lại kỹ năng.
+
+Khi Skill đã nạp thành công, mỗi lần làm việc chỉ cần gọi tên Skill (vd gõ phím tắt hoặc dấu gạch ngang) là Claude tự kích hoạt quy trình từ A-Z, không cần nhập lại câu lệnh dài.`
+  },
 ];
 
 /* Tìm trong kho tri thức: chấm điểm theo từ khoá + tiêu đề, trả về bài khớp nhất */
@@ -784,10 +818,10 @@ async function callRAG(query) {
 
 const SUGGESTIONS = [
   'Cách quay màn hình bằng Focusy?',
-  'Prompt Chaining là gì và dùng thế nào?',
+  'Cách nạp Skill vào Claude?',
   'Tối ưu SEO YouTube đạt 100 điểm thế nào?',
   'Làm sao nhận booking đều từ nhãn hàng?',
-  'Cách viết prompt hiệu quả cho Claude?',
+  'Prompt Chaining là gì và dùng thế nào?',
   'Mô hình AI nào dễ bắt đầu nhất cho người mới?',
 ];
 
