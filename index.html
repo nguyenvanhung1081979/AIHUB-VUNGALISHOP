@@ -182,44 +182,6 @@
     </div>
 
     <div class="max-w-3xl mx-auto">
-      <!-- Trợ lý tri thức trỏ thẳng vào Gemini Notebook -->
-      <a href="https://notebook.google.com/notebook/00b1b42d-65fd-42ad-b00b-2b040394dbc5" target="_blank" rel="noopener"
-         class="card-hover block bg-gradient-to-br from-lime/12 via-surface to-surface border border-lime/40 rounded-2xl p-6 mb-6 group">
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-          <div class="flex items-start gap-4">
-            <span class="text-3xl shrink-0">📓</span>
-            <div>
-              <div class="font-mono text-[11px] text-lime/80 mb-1">★ TRỢ LÝ TRI THỨC · GEMINI NOTEBOOK</div>
-              <h3 class="font-display text-xl font-600 mb-1">Hỏi trực tiếp kho tri thức của VungAliShop</h3>
-              <p class="text-sm text-muted max-w-lg">Trợ lý chạy trên Gemini Notebook, trả lời <b>bám đúng tài liệu gốc</b> của hệ thống — có trích dẫn nguồn. Bấm để mở và đặt câu hỏi.</p>
-            </div>
-          </div>
-          <span class="shrink-0 inline-flex items-center gap-2 bg-lime text-base font-600 text-sm px-5 py-3 rounded-xl group-hover:bg-lime-bright transition-colors">
-            Mở trợ lý tri thức
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
-        </div>
-      </a>
-
-      <!-- Dải phân cách -->
-      <div class="flex items-center gap-3 mb-4">
-        <div class="flex-1 h-px bg-line"></div>
-        <span class="font-mono text-[11px] text-muted">— hoặc hỏi nhanh bằng Gemini —</span>
-        <div class="flex-1 h-px bg-line"></div>
-      </div>
-
-      <!-- API key -->
-      <div class="flex flex-col sm:flex-row gap-2 mb-4">
-        <div class="relative flex-1">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-lime/60">API_KEY</span>
-          <input id="apikey" type="password" placeholder="Dán API key của bạn…"
-            class="w-full bg-surface border border-line rounded-lg pl-[76px] pr-3 py-2.5 text-sm font-mono text-ink placeholder:text-muted/60 focus:outline-none focus:border-lime/60 transition-colors" />
-        </div>
-        <button id="save-key" class="px-4 py-2.5 rounded-lg bg-elevated border border-line text-sm font-mono hover:border-lime/50 hover:text-lime transition-colors whitespace-nowrap">
-          Lưu key
-        </button>
-      </div>
-
       <!-- Chat window -->
       <div class="bg-surface border border-line rounded-2xl overflow-hidden">
         <div class="flex items-center justify-between px-4 py-2.5 border-b border-line bg-elevated/50">
@@ -243,7 +205,7 @@
             </button>
           </div>
           <p class="font-mono text-[10px] text-muted/70 mt-2 px-1">
-            * Tra cứu <span class="text-lime/70">trong kho tri thức của bạn</span> — không cần API key. Nhập key Gemini (tuỳ chọn) để AI trả lời mượt hơn dựa trên đúng bài viết.
+            * Tra cứu <span class="text-lime/70">trong kho tri thức của VungAliShop</span> — miễn phí, không cần cấu hình gì.
           </p>
         </div>
       </div>
@@ -617,14 +579,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 const chatEl = document.getElementById('chat');
 const chipsEl = document.getElementById('chips');
 const inputEl = document.getElementById('chat-input');
-const apikeyEl = document.getElementById('apikey');
-
-/* Nạp lại API key đã lưu */
-apikeyEl.value = store.getItem('kol_api_key') || '';
-document.getElementById('save-key').addEventListener('click', () => {
-  store.setItem('kol_api_key', apikeyEl.value.trim());
-  showToast('Đã lưu API key');
-});
 
 /* ============================================================
    KHO TRI THỨC CỦA BẠN (tự viết bằng lời của mình — không vi phạm bản quyền)
@@ -634,7 +588,7 @@ document.getElementById('save-key').addEventListener('click', () => {
 const KNOWLEDGE = [
   {
     title: 'Cách dùng phần mềm Focusy để quay màn hình',
-    k: ['focusy','quay màn hình','ghi màn hình','screen record','auto-cut','auto cut','zoom','edit video','xuất video','record'],
+    k: ['focusy','quay màn hình','ghi màn hình','thu màn hình','quay video màn hình','phần mềm quay','screen record','screencast','auto-cut','auto cut','cắt video','zoom','edit video','chỉnh sửa video','xuất video','record','làm video hướng dẫn'],
     a:
 `Focusy là phần mềm quay màn hình và chỉnh sửa video tự động bằng AI, mạnh nhất ở khả năng tự động zoom bám theo con chuột và tự cắt bỏ đoạn ậm ừ — đỡ phải edit thủ công.
 
@@ -662,7 +616,7 @@ BƯỚC 5 — Xuất video chất lượng cao
   },
   {
     title: 'Pillar (Trụ cột): 4 trụ cột vận hành + 3 trụ cột định vị thương hiệu KOL AI',
-    k: ['pillar','trụ cột','tru cot','định vị','dinh vi','thương hiệu','vận hành','hệ thống','kol system','solopreneur','doanh nghiệp 1 người','xương sống'],
+    k: ['pillar','trụ cột','tru cot','cột trụ','định vị','dinh vi','thương hiệu','thương hiệu cá nhân','vận hành','hệ thống','xây hệ thống','kol system','hệ thống kol','solopreneur','doanh nghiệp 1 người','doanh nghiệp một người','1 người','xương sống','nền tảng'],
     a:
 `Trong hệ thống Doanh nghiệp 1 người với AI (Solopreneur), "Pillar" (Trụ cột) gồm hai nhóm: 4 trụ cột vận hành hệ thống và 3 trụ cột định vị thương hiệu.
 
@@ -688,7 +642,7 @@ Ba yếu tố khóa chặt để KOL AI có sức ảnh hưởng và nhận book
   },
   {
     title: 'Cách nhận booking đều đặn từ nhãn hàng công nghệ & AI',
-    k: ['booking','nhãn hàng','nhan hang','brand','hợp tác','hop tac','thumbnail','case study','earn in public','chào hàng','outreach','cộng đồng','kol ai go global','đối tác','quảng cáo'],
+    k: ['booking','nhận booking','nhãn hàng','nhan hang','brand','hợp tác','hop tac','tài trợ','sponsor','deal','thumbnail','case study','earn in public','chào hàng','outreach','cộng đồng','kol ai go global','đối tác','quảng cáo','hợp đồng','làm việc với nhãn hàng'],
     a:
 `Muốn nhận booking đều từ nhãn hàng công nghệ & AI, đừng ngồi chờ họ tìm đến — hãy chủ động thiết kế "kệ hàng" để chứng minh năng lực và tạo sẵn vị trí cho họ trả tiền. Các chiến lược thực chiến:
 
@@ -706,7 +660,7 @@ Ba yếu tố khóa chặt để KOL AI có sức ảnh hưởng và nhận book
   },
   {
     title: 'So sánh 5 mô hình kiếm tiền bằng AI (thang dễ bắt đầu 1-10 & thu nhập)',
-    k: ['mô hình','mo hinh','kiếm tiền','1000 usd','1.000','thu nhập','dễ bắt đầu','de bat dau','ugc','clipping','ai sale','copywriter','ai seo','làm thêm','lam them','so sánh','chọn mô hình'],
+    k: ['mô hình','mo hinh','kiếm tiền','kiếm tiền online','kiếm tiền bằng ai','kiếm tiền với ai','làm giàu','thu nhập','thu nhập online','1000 usd','1.000','1000$','kiếm 1000','dễ bắt đầu','de bat dau','người mới','bắt đầu với ai','ugc','clipping','ai sale','copywriter','làm thêm','lam them','side hustle','nghề ai','so sánh','chọn mô hình','làm gì với ai'],
     a:
 `Thang điểm "dễ bắt đầu" (1-10) giúp Solopreneur chọn mô hình phù hợp để bứt phá tới mốc 1.000 USD/tháng.
 
@@ -723,6 +677,80 @@ XẾP HẠNG THEO ĐỘ DỄ BẮT ĐẦU:
 • AI SEO — 4/10: cần nghiên cứu bộ từ khóa chuyên sâu. Biên lợi nhuận rất lớn vì doanh nghiệp trả cao cho người tối ưu traffic tự động. Thu nhập: đạt mốc 1.000 USD. Vốn: 0đ (thời gian & chất xám).
 
 TÓM LẠI: mô hình càng dễ bắt đầu (KOL AI, Clipping) càng hợp người mới; mô hình khó hơn (Copywriter, SEO) có biên lợi nhuận lớn hơn nhưng đòi hỏi kỹ năng chuyên sâu.`
+  },
+  {
+    title: 'Cách viết prompt hiệu quả & đóng gói "Skill" cho Claude',
+    k: ['prompt','viết prompt','câu lệnh','cau lenh','ra lệnh','ra lệnh cho ai','claude','claude code','skill','claude skill','đóng gói','dong goi','đóng gói skill','mọi thứ giữ nguyên','project','bộ nhớ','brand voice','dạy ai','huấn luyện ai'],
+    a:
+`I. TƯ DUY CỐT LÕI KHI VIẾT PROMPT CHO CLAUDE
+
+1. "Câu lệnh nông dân" (tiếng Việt tự nhiên): không cần viết câu lệnh học thuật hay phức tạp. Claude giỏi ngôn ngữ — cứ nói thẳng, muốn gì thì liệt kê rõ ràng yêu cầu là đủ.
+
+2. Mật lệnh "Mọi thứ giữ nguyên": câu lệnh tối quan trọng khi muốn Claude chỉnh một phần nhỏ trong hệ thống lớn (code website, Landing Page, kịch bản). Luôn mở đầu bằng cụm này để Claude không tự ý đổi/làm lỗi/xóa các phần đang chạy ổn.
+Ví dụ: "Mọi thứ giữ nguyên. Hãy đổi màu giao diện thành xanh thiên nhiên và đổi tiêu đề thành..."
+
+3. Dùng "Bộ nhớ" (Project) để tránh trôi thông tin: có nhiều tài liệu/sản phẩm/kịch bản lớn thì nạp hết vào tính năng Project của Claude. Nó lưu thông tin cố định, hiểu sâu tiếng nói thương hiệu (brand voice) và không "quên bài" trong phiên dài.
+
+II. ĐÓNG GÓI QUY TRÌNH THÀNH "CLAUDE SKILL"
+
+Thay vì mỗi ngày gõ lại từng câu lệnh, hãy đóng gói quy trình lặp lại thành một file "Skill" tĩnh cài vào Claude. Một Skill chuẩn cần 5 yếu tố:
+• Màu sắc thương hiệu (Brand Colors): tông màu chủ đạo của sản phẩm/giao diện.
+• Nhân vật đại diện (Persona): vai trò, vị thế và giọng văn của AI.
+• Phong cách thể hiện (Style): cách trình bày (kể chuyện, tối giản, chuyên nghiệp...).
+• Quy trình mỗi ngày (Daily Workflow): từng bước xử lý đầu vào và đầu ra.
+• Test & kiểm tra (Testing): bước rà soát cuối để đảm bảo kết quả đúng ý.
+
+Mẫu prompt nạp Skill: "[Tải lên file dữ liệu/hình ảnh tham chiếu]. Màu sắc thương hiệu của tôi là trắng và vàng neon. Phong cách skill này tập trung vào nhân vật và text kể chuyện. Quy trình mỗi ngày: tôi đưa nội dung thô vào, bạn tự phân tích tìm từ khóa đắt giá hướng tới tệp khách hàng mục tiêu và xuất đầu ra kèm chữ ký của tôi. Hãy học và đóng gói quy trình này thành một file Skill hoàn chỉnh."
+
+III. MẪU PROMPT THỰC CHIẾN THEO TÁC VỤ
+
+• Tính hoa hồng tự động (bảng tính): "Hãy giúp tôi tổng hợp thành file báo cáo cho nhân sự. Mỗi khi có đơn phát sinh, họ tự điền và hệ thống tự tính 5% hoa hồng trên mỗi đơn thành công. Chia rõ cột: Khách hàng, Sản phẩm, Thống kê theo ngày, Hoa hồng thực nhận, Ghi chú."
+
+• SEO YouTube tự động: "Tôi gửi tiêu đề video này: [dán tiêu đề]. Dùng kỹ năng SEO YouTube phân tích và tối ưu. Xuất đúng 25 tiêu đề từ khóa người dùng hay tìm nhất, viết đoạn mô tả SEO ở dòng đầu thật cuốn hút, và danh sách hashtag phù hợp để tăng đề xuất."
+
+• Điều khiển Claude Code edit video: "Tôi muốn dùng kỹ năng edit video. Hãy đọc kỹ file video thô đã tải lên trong thư mục dự án, phân tích transcript và đề xuất phương án cắt dựng. Cụ thể: sau khi tôi nói xong câu về 'thời gian một tuần', thu nhỏ gương mặt tôi ở góc trái màn hình, đồng thời chèn hiệu ứng hoạt họa mô tả ở góc phải để video thu hút hơn."`
+  },
+  {
+    title: 'Tối ưu SEO YouTube đạt 100 điểm (quy trình khép kín)',
+    k: ['seo youtube','seo','seo video','ai seo','youtube','tiêu đề','tieu de','title','thumbnail','mô tả','mo ta','description','timeline','chapter','playlist','danh sách phát','tag','hashtag','ctr','đề xuất','lên đề xuất','lên xu hướng','tăng view','tăng lượt xem','thuật toán youtube','100 điểm','100 diem','tối ưu youtube','tối ưu video'],
+    a:
+`Quy trình tối ưu SEO khép kín đẩy điểm SEO video YouTube lên tối đa 100 điểm, giúp video liên tục được thuật toán đề xuất đúng tệp khách hàng.
+
+1. TỐI ƯU TIÊU ĐỀ & THUMBNAIL (kích thích CTR)
+• Tiêu đề thôi miên: ngắn gọn, tập trung giải quyết nhanh vấn đề người xem. Ưu tiên lồng con số thực tế, mốc thời gian (vd thêm năm hiện tại), hoặc tên nhãn hàng/công cụ để tăng uy tín và trúng mục tiêu tìm kiếm.
+• Thumbnail tối giản: thể hiện rõ nội dung video, viết ít chữ (5–7 chữ trên ảnh). Đồng nhất hình ảnh cá nhân (vd áo màu nổi bật như vàng) + logo nhãn hàng để trông chuyên nghiệp.
+
+2. CẤU TRÚC MÔ TẢ CHUẨN SEO
+• Dòng đầu tiên = tiêu đề video: copy nguyên văn tiêu đề dán xuống dòng đầu phần mô tả. Đây là yếu tố cốt lõi giúp robot YouTube nhận diện chủ đề và tăng hiển thị khi tìm kiếm.
+• Đoạn mô tả chủ chốt + link phễu: viết ngắn gọn giá trị video, lồng từ khóa trọng tâm. Đặt link quà tặng (Lead Magnet), link affiliate, hoặc link trang bán hàng ở phía dưới — giấu dưới nấc "hiển thị thêm" giúp video giữ uy tín và dễ được nền tảng chấp nhận.
+• Tài nguyên & kết nối: cuối mô tả để đầy đủ link công cụ, tài liệu để tạo thói quen nhấp chuột.
+
+3. THIẾT LẬP TIMELINE (CHAPTERS)
+Bắt buộc thêm mốc thời gian Timeline chi tiết trong mô tả. Các mốc này giúp người xem lướt chọn đúng phần cần, và sự ngăn nắp là điểm cộng lớn giúp video được đề xuất liên tục.
+
+4. THẺ TAG & PLAYLIST ĐỀ XUẤT CHÉO
+• Dán 4 playlist chủ lực: ở thẻ tag hoặc mô tả, dán chính xác 4 link danh sách phát chủ lực của kênh. Giúp YouTube nhận diện liên quan và tăng đề xuất video cùng kênh.
+• Sức mạnh Playlist: gom video thành chuỗi playlist chuyên sâu theo chủ đề thay vì làm lẻ tẻ. YouTube ưu tiên đề xuất playlist vì khi một video bùng nổ, nó kéo cả chuỗi lên xu hướng.
+
+5. DÙNG CLAUDE TỰ ĐỘNG HÓA SEO
+Thay vì tự nghĩ từ khóa và viết mô tả thủ công, nạp tiêu đề video vào Claude:
+• AI xuất chính xác 25 tiêu đề từ khóa người dùng đang tìm nhiều nhất trên YouTube.
+• AI soạn đoạn mô tả chuẩn SEO chứa từ khóa và cấu trúc thẻ tag.
+• Việc của bạn: dán bộ từ khóa vào YouTube Studio để hệ thống tự quét và nâng điểm SEO lên 100.`
+  },
+  {
+    title: 'Prompt Chaining — chuỗi câu lệnh tự động hóa nội dung chuyên sâu',
+    k: ['prompt chaining','chuỗi câu lệnh','chuoi cau lenh','chuỗi prompt','nối câu lệnh','chaining','chia nhỏ prompt','tự động hóa nội dung','tự động viết bài','sản xuất nội dung','viết bài bằng ai','quy trình viết','aida','pas','dàn ý','dan y','biên tập','bien tap','make.com','ai agent','4 bước'],
+    a:
+`Prompt Chaining (chuỗi câu lệnh) là kỹ thuật chia nhỏ quy trình sản xuất nội dung thành các bước nối tiếp, lấy đầu ra của bước trước làm đầu vào cho bước sau. Bắt AI làm tất cả trong một câu lệnh thường cho kết quả hời hợt, thiếu tự nhiên; chia chuỗi giúp chất lượng cao và mượt hơn.
+
+QUY TRÌNH 4 BƯỚC CHUẨN:
+• Bước 1 — Nghiên cứu: phân tích tài liệu và trích xuất điểm đau (pain point) của khách hàng.
+• Bước 2 — Dàn ý: xây khung cấu trúc bài viết theo mô hình (AIDA, PAS...).
+• Bước 3 — Soạn thảo: viết chi tiết từng phần theo đúng tông giọng yêu cầu.
+• Bước 4 — Biên tập: đóng vai biên tập viên rà soát, loại bỏ từ thừa, tối ưu độ mượt.
+
+LỢI ÍCH: kiểm soát chất lượng từng công đoạn, dễ tinh chỉnh, và sẵn sàng đóng gói vào các quy trình tự động hóa (Make.com, AI Agent).`
   },
 ];
 
@@ -743,76 +771,24 @@ function searchKB(query) {
 
 const DEFAULT_A = 'Mình chưa tìm thấy mục nào khớp trong kho tri thức. Bạn thử hỏi bằng từ khoá khác, hoặc bấm một gợi ý bên dưới nhé. (Chủ kênh có thể bổ sung thêm bài viết vào kho bất cứ lúc nào.)';
 
-/* ====== TRA CỨU KHO TRI THỨC (mặc định) + GEMINI (tuỳ chọn) ======
-   - KHÔNG key -> tra cứu trong KNOWLEDGE, trả về đúng bài. Miễn phí, không cần gì.
-   - CÓ key    -> Gemini trả lời mượt hơn nhưng BÁM tài liệu khớp (RAG thật), key lấy từ ô nhập.
-
-   Model mặc định: gemini-3.6-flash. Muốn RẺ NHẤT -> 'gemini-3.5-flash-lite'.
+/* ====== TRA CỨU KHO TRI THỨC ======
+   Tìm trong KNOWLEDGE và trả về đúng bài. Miễn phí, chạy hoàn toàn trong trình duyệt,
+   không cần API key, không backend.
    >>> Mở rộng kho: thêm mục vào mảng KNOWLEDGE ở trên. */
-const GEMINI_MODEL = 'gemini-3.6-flash';
-
-/* "Bộ nhớ nền" định hình vai trò trợ lý — đây là chỗ nhồi tri thức/RAG của bạn */
-const SYSTEM_PROMPT =
-`Bạn là trợ lý tri thức của "VungAliShop AI Hub", phục vụ một solopreneur người Việt \
-làm creator/affiliate trên Facebook, TikTok và đầu tư tài chính (forex, vàng, chỉ số).
-Chuyên môn: tạo KOL AI, mật mã traffic, affiliate tự động, xây AI Agent, content factory, vibe coding.
-Trả lời NGẮN GỌN, thực chiến, đi thẳng vào hành động, bằng tiếng Việt.
-Viết văn xuôi thuần, hạn chế markdown. Không lan man, không rào đón dài dòng.`;
-
 async function callRAG(query) {
-  const key = (apikeyEl.value.trim() || store.getItem('kol_api_key') || '').trim();
-  const hit = searchKB(query); // bài khớp nhất trong kho tri thức của bạn
-
-  /* --- KHÔNG cần key: tra cứu ngay trong kho tri thức, trả về đúng bài --- */
-  if (!key) {
-    await new Promise(r => setTimeout(r, 350));
-    if (hit) return '📌 ' + hit.title + '\n\n' + hit.a;
-    return DEFAULT_A;
-  }
-
-  /* --- Có key: Gemini trả lời DỰA TRÊN bài khớp (RAG thật) --- */
-  const grounding = hit
-    ? '\n\n--- TÀI LIỆU GỐC (chỉ trả lời dựa trên nội dung này, không bịa) ---\n' + hit.title + '\n' + hit.a
-    : '\n\n(Không tìm thấy tài liệu khớp trong kho. Nếu câu hỏi ngoài phạm vi, hãy nói bạn chưa có thông tin.)';
-
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent';
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT + grounding }] },
-        contents: [{ role: 'user', parts: [{ text: query }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 600 }
-      })
-    });
-
-    if (!res.ok) {
-      if (res.status === 400 || res.status === 403)
-        return '⚠️ API key không hợp lệ hoặc chưa bật quyền. Kiểm tra lại key tại Google AI Studio.';
-      if (res.status === 429)
-        return '⚠️ Đã chạm giới hạn lượt (rate limit / hết quota free). Chờ chút rồi thử lại.';
-      return '⚠️ Lỗi Gemini (mã ' + res.status + '). Thử lại sau nhé.';
-    }
-
-    const data = await res.json();
-    const text = (data.candidates && data.candidates[0]
-      && data.candidates[0].content && data.candidates[0].content.parts
-      || []).map(p => p.text || '').join('');
-    return text || 'Mình chưa nhận được nội dung trả về. Thử hỏi lại theo cách khác nhé.';
-  } catch (e) {
-    return '⚠️ Không gọi được API (có thể do mạng, hoặc CORS trong khung xem trước của Claude). '
-      + 'Khi anh tải file về / deploy lên hosting thật thì sẽ chạy bình thường.';
-  }
+  await new Promise(r => setTimeout(r, 300));
+  const hit = searchKB(query); // bài khớp nhất trong kho tri thức
+  if (hit) return '📌 ' + hit.title + '\n\n' + hit.a;
+  return DEFAULT_A;
 }
 
 const SUGGESTIONS = [
   'Cách quay màn hình bằng Focusy?',
-  '"Pillar" trong hệ thống Solopreneur là gì?',
-  'Mô hình AI nào dễ bắt đầu nhất cho người mới?',
+  'Prompt Chaining là gì và dùng thế nào?',
+  'Tối ưu SEO YouTube đạt 100 điểm thế nào?',
   'Làm sao nhận booking đều từ nhãn hàng?',
-  'Kiếm 1.000 USD/tháng bằng AI: chọn mô hình nào?',
-  '4 trụ cột vận hành hệ thống KOL AI?',
+  'Cách viết prompt hiệu quả cho Claude?',
+  'Mô hình AI nào dễ bắt đầu nhất cho người mới?',
 ];
 
 function bubble(role, text, typing = false) {
