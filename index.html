@@ -1052,10 +1052,58 @@ Trân trọng,
 [Ký tên của bạn]
 Chuyên gia Giải pháp AI Doanh nghiệp`,
   },
+  {
+    tag: 'TOOL_06 · PROMPT PACK', title: 'Bộ Prompt Marketing VungAliShop (14 prompt)',
+    desc: 'Bộ prompt marketing gốc theo ngữ cảnh KOL AI / affiliate / tài chính. Thay phần trong [ ] rồi dán vào Claude hoặc ChatGPT.',
+    lang: 'prompt',
+    code:
+`BỘ PROMPT MARKETING — VUNGALISHOP AI HUB
+Thay phần trong [ ] bằng thông tin của bạn rồi dán vào Claude / ChatGPT.
+
+━━ A. HOOK & QUẢNG CÁO (FACEBOOK / TIKTOK) ━━
+
+1. Viết 5 hook 3 giây đầu cho video ngắn về [chủ đề/sản phẩm], nhắm tới [đối tượng] đang gặp [nỗi đau]. Mỗi hook dưới 15 từ, gây tò mò hoặc chạm nỗi đau, không dùng emoji.
+
+2. Viết 5 tiêu đề quảng cáo Facebook cho [sản phẩm affiliate], nhắm [đối tượng], nhấn vào lợi ích [kết quả cụ thể] và tạo cảm giác cấp bách. Mỗi tiêu đề dưới 40 ký tự.
+
+3. Tạo 3 biến thể caption bán hàng cho [sản phẩm], thử 3 góc: (1) kết quả/sự chuyển đổi, (2) sợ bỏ lỡ, (3) bằng chứng thực tế. Kết mỗi bài bằng CTA mềm dẫn về [link/Zalo].
+
+━━ B. KỊCH BẢN VIDEO NGẮN (DƯỚI 60 GIÂY) ━━
+
+4. Viết kịch bản video dọc dưới 60 giây (100-120 từ) về [chủ đề] theo cấu trúc Hook - Body - CTA. Hook đánh vào tò mò, Body chứng minh bằng kết quả + quy trình ngắn, CTA hướng nhận quà miễn phí ở BioLink. Giọng mộc mạc, dễ đọc để nạp AI clone giọng.
+
+5. Từ [ý tưởng thô], tách thành 3 kịch bản short khác nhau (3 góc nhìn) cho cùng một sản phẩm, mỗi kịch bản dưới 45 giây.
+
+━━ C. AFFILIATE & BÁN HÀNG ━━
+
+6. Viết bài review sản phẩm [tên sản phẩm affiliate] dạng trải nghiệm thật của mình: nêu 3 lợi ích cụ thể + 1 nhược điểm nhỏ để tăng độ tin, kết bằng CTA dẫn link.
+
+7. Viết copy gói ưu đãi cho [sản phẩm]: sản phẩm chính + [số] bonus, tổng giá trị, giá thật, và lý do đáng mua ngay. Làm người đọc thấy đây là món hời rõ ràng.
+
+8. Viết 5 câu trả lời phá bỏ phản đối khi bán [sản phẩm]: giá, không có thời gian, hoài nghi hiệu quả, "để sau", "không hợp với tôi".
+
+━━ D. NUÔI LEAD QUA ZALO / EMAIL ━━
+
+9. Viết chuỗi 3 tin nhắn Zalo chăm sóc người vừa để lại thông tin nhận quà [tên quà]: (1) gửi quà + chào, (2) hướng dẫn dùng + trao giá trị, (3) giới thiệu nhẹ [sản phẩm] kèm ưu đãi.
+
+10. Viết chuỗi 3 tin nhắn cho người đã bấm quan tâm [sản phẩm] nhưng chưa mua: nhắc nhở, xử lý phản đối chính, tạo cấp bách nhẹ.
+
+━━ E. NỘI DUNG TÀI CHÍNH (FOREX / VÀNG / CHỈ SỐ) ━━
+
+11. Viết bài giáo dục ngắn về [khái niệm tài chính, vd: quản trị rủi ro] cho người mới. Tách rõ phần kiến thức và phần quan điểm cá nhân, luôn kèm một dòng cảnh báo rủi ro ở cuối. Không hứa hẹn lợi nhuận.
+
+12. Viết caption cho biểu đồ/phân tích [thị trường] theo hướng chia sẻ góc nhìn cá nhân, khách quan, kèm nhắc rõ đây không phải lời khuyên đầu tư.
+
+━━ F. CASE STUDY & BẰNG CHỨNG ━━
+
+13. Viết case study ngắn (150 từ) về [khách hàng/kết quả] theo cấu trúc: tình huống → vấn đề → giải pháp (dùng sản phẩm/dịch vụ của tôi) → kết quả đo được. Chèn được vào bài bán hàng.
+
+14. Từ [lời khen của khách], viết lại thành một bài bằng chứng xã hội tự nhiên để đăng Facebook, kèm CTA nhẹ.`,
+  },
 ];
 
 const toolList = document.getElementById('tool-list');
-const toolCTA = [PRODUCTS.sara, PRODUCTS.system, PRODUCTS.vip, PRODUCTS.omni, PRODUCTS.system]; // theo thứ tự 5 tool
+const toolCTA = [PRODUCTS.sara, PRODUCTS.system, PRODUCTS.vip, PRODUCTS.omni, PRODUCTS.system, PRODUCTS.vip]; // theo thứ tự 6 tool
 tools.forEach((t, idx) => {
   const block = document.createElement('div');
   block.className = 'bg-surface border border-line rounded-2xl overflow-hidden';
