@@ -40,6 +40,8 @@
 <style>
   :root { color-scheme: dark; }
   html { scroll-behavior: smooth; }
+  /* Mọi link kế thừa màu chữ, tránh bị màu 'đã ghé thăm' (tím/tối) của trình duyệt */
+  a, a:visited { color: inherit; }
   body {
     background-color: #080a08;
     background-image:
@@ -552,7 +554,7 @@ const productGrid = document.getElementById('product-grid');
       <span class="text-3xl">${p.icon}</span>
       ${p.price ? `<span class="font-mono text-xs text-lime border border-lime/30 rounded-full px-2.5 py-1">${p.price}</span>` : ''}
     </div>
-    <h3 class="font-display text-base font-600 mb-2 leading-snug">${p.name}</h3>
+    <h3 class="font-display text-base font-600 mb-2 leading-snug text-ink">${p.name}</h3>
     <p class="text-sm text-muted leading-relaxed flex-1">${p.desc}</p>
     <span class="mt-4 font-mono text-xs text-lime flex items-center gap-1.5">
       Xem chi tiết
@@ -756,7 +758,7 @@ LỢI ÍCH: kiểm soát chất lượng từng công đoạn, dễ tinh chỉnh
     title: 'Cách nạp / cài Skill vào Claude (Project, Cowork, từ ChatGPT)',
     k: ['nạp skill','nap skill','cài skill','cai skill','cài đặt skill','install skill','load skill','đưa skill vào claude','nạp file','claude cowork','cowork','dự án claude','chuyển skill','skill từ chatgpt','kích hoạt skill','gọi skill','phím tắt skill'],
     a:
-`Cách nạp một "Skill" (kỹ năng) vào Claude để tự động hóa các tác vụ lặp lại theo quy trình.
+`Cách nạp một "Skill" (kỹ năng) vào Claude để tự động hóa các tác vụ lặp lại. Nạp qua Project (Dự án) là cách tối ưu nhất — Claude không quên thông tin, không trôi quy trình trong phiên dài.
 
 I. CHUẨN BỊ FILE SKILL HOÀN CHỈNH
 Đóng gói quy trình thành một file văn bản tĩnh gồm 5 yếu tố nền tảng:
@@ -766,25 +768,22 @@ I. CHUẨN BỊ FILE SKILL HOÀN CHỈNH
 • Quy trình mỗi ngày (Daily Workflow): từng bước xử lý đầu vào và đầu ra.
 • Kiểm tra (Testing): quy chuẩn rà soát cuối để kết quả luôn đồng nhất, đúng ý.
 
-II. CÁC CÁCH NẠP SKILL VÀO CLAUDE
+II. NẠP QUA PROJECT (DỰ ÁN) — 4 BƯỚC CHI TIẾT
 
-Cách 1 — Qua tính năng Dự án (Project) trên Claude Chat (web):
-1. Tạo một Project mới trong tài khoản Claude.
-2. Vào cài đặt của Project và nạp file Skill đã soạn sẵn vào đó.
-3. Claude tự học, ghi nhớ và vận hành theo "Bộ nhớ" của dự án (quy trình, tiếng nói thương hiệu, dữ liệu sản phẩm) mà không cần nhập lại hướng dẫn.
+Bước 1 — Đóng gói Skill thành file tĩnh: copy toàn bộ nội dung bộ khung Skill, dán vào một tệp văn bản trơn (Notepad trên Windows / TextEdit trên Mac), lưu dưới dạng .txt hoặc .md (vd đặt tên: skill_viet_kich_ban_tiktok.txt).
 
-Cách 2 — Qua Claude Cowork (bản Desktop):
-1. Mở ứng dụng Claude Cowork trên máy tính.
-2. Tạo/trỏ đường dẫn đến thư mục làm việc riêng để lưu dữ liệu trực tiếp.
-3. Đẩy file Skill vào thư mục dự án đó.
-4. Gõ lệnh: "Cài skill này cho tôi" để hệ thống tự nhận diện và tích hợp.
+Bước 2 — Tạo Project trên Claude.ai: vào tài khoản Claude.ai, menu bên trái chọn Projects → Create Project. Đặt tên dự án theo mục tiêu (vd "Xây kênh TikTok Hệ Thống"). Lưu ý: từ 2/2026 Project cá nhân đã dùng được trên cả gói Free; gói trả phí cho giới hạn cao hơn, còn Project dùng chung nhiều người mới cần gói Team.
 
-Cách 3 — Kế thừa Skill từ ChatGPT sang Claude:
-• Tạo, huấn luyện và đóng gói Skill trên ChatGPT trước.
-• Xuất và tải file Skill về máy dưới dạng file văn bản.
-• Nạp file đó vào Claude để AI kế thừa và dùng lại kỹ năng.
+Bước 3 — Nạp file vào Project Knowledge: ở giao diện dự án, tìm khu vực Project Knowledge (bộ nhớ của dự án, thường ở cột phải), bấm tải tệp lên và chọn file Skill đã chuẩn bị. Mẹo: nạp thêm tài liệu sản phẩm, thông tin ngách, kịch bản mẫu từng viral vào chung để Claude học sâu và đồng bộ ngữ cảnh bán hàng của bạn.
 
-Khi Skill đã nạp thành công, mỗi lần làm việc chỉ cần gọi tên Skill (vd gõ phím tắt hoặc dấu gạch ngang) là Claude tự kích hoạt quy trình từ A-Z, không cần nhập lại câu lệnh dài.`
+Bước 4 — Thiết lập Project Instructions (chỉ dẫn dự án): bấm Set Custom Instructions, dán câu định hướng ngắn, vd: "Hãy đọc kỹ file skill trong tri thức dự án. Luôn đóng vai nhân vật đại diện, tuân thủ bảng màu, phong cách kể chuyện và quy trình trong file Skill đó cho mọi câu trả lời."
+
+CÁCH RA LỆNH SAU KHI NẠP:
+Bấm Start a new chat ngay trong dự án và ra lệnh tự nhiên, vd: "Sử dụng Skill viết kịch bản TikTok, viết cho tôi kịch bản ngắn về chủ đề: [chủ đề của bạn]". Claude đọc tri thức đã nạp và xuất kịch bản chuẩn Hook-Body-CTA, không lệch tông giọng.
+
+III. CÁCH KHÁC
+• Claude Cowork (bản Desktop): mở Cowork → trỏ tới thư mục làm việc → đẩy file Skill vào thư mục → gõ "Cài skill này cho tôi".
+• Từ ChatGPT sang Claude: nếu đã soạn quy trình trên ChatGPT, tải nội dung về rồi soạn lại theo đúng cấu trúc file Skill của Claude để nạp (định dạng hai bên khác nhau nên thường phải chỉnh lại, không cắm thẳng được).`
   },
 ];
 
